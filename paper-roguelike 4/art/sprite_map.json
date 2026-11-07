@@ -1,0 +1,870 @@
+{
+ "scale": 2,
+ "sheetW": 2100,
+ "sheetH": 5422,
+ "sprites": {
+  "player_0": {
+   "x": 123,
+   "y": 436,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Player 1 (no armor)"
+  },
+  "player_1": {
+   "x": 359,
+   "y": 436,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Player 2 (no armor)"
+  },
+  "armor_knightArmor": {
+   "x": 123,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Knight Armor"
+  },
+  "armor_blacksmithArmor": {
+   "x": 359,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Blacksmith Armor"
+  },
+  "armor_princeArmor": {
+   "x": 595,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Prince Armor"
+  },
+  "armor_monkVest": {
+   "x": 831,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Monk Vest"
+  },
+  "armor_amuletRobe": {
+   "x": 1067,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Amulet Robe"
+  },
+  "armor_archerRobes": {
+   "x": 1303,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Training Archer Robes"
+  },
+  "armor_agilityCloak": {
+   "x": 1539,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Agility Cloak"
+  },
+  "armor_dragonHide": {
+   "x": 1775,
+   "y": 696,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Dragon Hide Cloak"
+  },
+  "armor_apprenticeHunting": {
+   "x": 123,
+   "y": 846,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Apprentice Hunting Gear"
+  },
+  "armor_camoCloak": {
+   "x": 359,
+   "y": 846,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Camo Cloak"
+  },
+  "armor_soloHunting": {
+   "x": 595,
+   "y": 846,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Solo Hunting Gear"
+  },
+  "armor_mageRobe": {
+   "x": 831,
+   "y": 846,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Mage Robe"
+  },
+  "enemy_runner": {
+   "x": 135,
+   "y": 1106,
+   "w": 40,
+   "h": 40,
+   "gameW": 20,
+   "gameH": 20,
+   "label": "Runner"
+  },
+  "enemy_shooter": {
+   "x": 369,
+   "y": 1106,
+   "w": 44,
+   "h": 44,
+   "gameW": 22,
+   "gameH": 22,
+   "label": "Shooter"
+  },
+  "enemy_charger": {
+   "x": 599,
+   "y": 1106,
+   "w": 56,
+   "h": 56,
+   "gameW": 28,
+   "gameH": 28,
+   "label": "Charger"
+  },
+  "enemy_tank": {
+   "x": 823,
+   "y": 1106,
+   "w": 80,
+   "h": 80,
+   "gameW": 40,
+   "gameH": 40,
+   "label": "Tank"
+  },
+  "enemy_bomber": {
+   "x": 1073,
+   "y": 1106,
+   "w": 52,
+   "h": 52,
+   "gameW": 26,
+   "gameH": 26,
+   "label": "Bomber"
+  },
+  "enemy_prisoner": {
+   "x": 1313,
+   "y": 1106,
+   "w": 44,
+   "h": 44,
+   "gameW": 22,
+   "gameH": 22,
+   "label": "Chained Prisoner"
+  },
+  "enemy_inkdrop": {
+   "x": 1553,
+   "y": 1106,
+   "w": 36,
+   "h": 40,
+   "gameW": 18,
+   "gameH": 20,
+   "label": "Ink Drop"
+  },
+  "enemy_inkblob": {
+   "x": 1777,
+   "y": 1106,
+   "w": 60,
+   "h": 64,
+   "gameW": 30,
+   "gameH": 32,
+   "label": "Inkblob"
+  },
+  "enemy_bigInkblob": {
+   "x": 111,
+   "y": 1272,
+   "w": 88,
+   "h": 92,
+   "gameW": 44,
+   "gameH": 46,
+   "label": "Big Inkblob"
+  },
+  "enemy_gale": {
+   "x": 365,
+   "y": 1272,
+   "w": 52,
+   "h": 52,
+   "gameW": 26,
+   "gameH": 26,
+   "label": "Gale"
+  },
+  "enemy_warlock": {
+   "x": 603,
+   "y": 1272,
+   "w": 48,
+   "h": 48,
+   "gameW": 24,
+   "gameH": 24,
+   "label": "Pyre Acolyte"
+  },
+  "enemy_fireWarlock": {
+   "x": 831,
+   "y": 1272,
+   "w": 64,
+   "h": 64,
+   "gameW": 32,
+   "gameH": 32,
+   "label": "Pyre Warlock (elite)"
+  },
+  "worm_head": {
+   "x": 111,
+   "y": 1560,
+   "w": 88,
+   "h": 80,
+   "gameW": 44,
+   "gameH": 40,
+   "label": "Bookworm head"
+  },
+  "worm_body": {
+   "x": 361,
+   "y": 1560,
+   "w": 60,
+   "h": 60,
+   "gameW": 30,
+   "gameH": 30,
+   "label": "Bookworm body A"
+  },
+  "worm_body2": {
+   "x": 597,
+   "y": 1560,
+   "w": 60,
+   "h": 60,
+   "gameW": 30,
+   "gameH": 30,
+   "label": "Bookworm body B"
+  },
+  "worm_tail": {
+   "x": 837,
+   "y": 1560,
+   "w": 52,
+   "h": 44,
+   "gameW": 26,
+   "gameH": 22,
+   "label": "Bookworm tail"
+  },
+  "sworm_head": {
+   "x": 1071,
+   "y": 1560,
+   "w": 56,
+   "h": 50,
+   "gameW": 28,
+   "gameH": 25,
+   "label": "Small Worm head"
+  },
+  "sworm_body": {
+   "x": 1316,
+   "y": 1560,
+   "w": 38,
+   "h": 38,
+   "gameW": 19,
+   "gameH": 19,
+   "label": "Small Worm body A"
+  },
+  "sworm_body2": {
+   "x": 1552,
+   "y": 1560,
+   "w": 38,
+   "h": 38,
+   "gameW": 19,
+   "gameH": 19,
+   "label": "Small Worm body B"
+  },
+  "sworm_tail": {
+   "x": 1790,
+   "y": 1560,
+   "w": 34,
+   "h": 28,
+   "gameW": 17,
+   "gameH": 14,
+   "label": "Small Worm tail"
+  },
+  "spit": {
+   "x": 139,
+   "y": 1726,
+   "w": 32,
+   "h": 32,
+   "gameW": 16,
+   "gameH": 16,
+   "label": "Ink spit"
+  },
+  "wormling_head": {
+   "x": 137,
+   "y": 1954,
+   "w": 36,
+   "h": 32,
+   "gameW": 18,
+   "gameH": 16,
+   "label": "Wormling head"
+  },
+  "wormling_body": {
+   "x": 379,
+   "y": 1954,
+   "w": 24,
+   "h": 24,
+   "gameW": 12,
+   "gameH": 12,
+   "label": "Wormling body"
+  },
+  "hog": {
+   "x": 597,
+   "y": 1954,
+   "w": 60,
+   "h": 48,
+   "gameW": 30,
+   "gameH": 24,
+   "label": "Hog"
+  },
+  "decoy": {
+   "x": 833,
+   "y": 1954,
+   "w": 60,
+   "h": 60,
+   "gameW": 30,
+   "gameH": 30,
+   "label": "Prop Target"
+  },
+  "arrow": {
+   "x": 133,
+   "y": 2210,
+   "w": 44,
+   "h": 16,
+   "gameW": 22,
+   "gameH": 8,
+   "label": "Arrow"
+  },
+  "bolt": {
+   "x": 371,
+   "y": 2210,
+   "w": 40,
+   "h": 16,
+   "gameW": 20,
+   "gameH": 8,
+   "label": "Crossbow bolt"
+  },
+  "manaarrow": {
+   "x": 601,
+   "y": 2210,
+   "w": 52,
+   "h": 24,
+   "gameW": 26,
+   "gameH": 12,
+   "label": "Mana arrow"
+  },
+  "slug": {
+   "x": 849,
+   "y": 2210,
+   "w": 28,
+   "h": 12,
+   "gameW": 14,
+   "gameH": 6,
+   "label": "Winchester shot"
+  },
+  "axe": {
+   "x": 1077,
+   "y": 2210,
+   "w": 44,
+   "h": 44,
+   "gameW": 22,
+   "gameH": 22,
+   "label": "Tomahawk (spins)"
+  },
+  "bullet": {
+   "x": 1325,
+   "y": 2210,
+   "w": 20,
+   "h": 20,
+   "gameW": 10,
+   "gameH": 10,
+   "label": "Player shot"
+  },
+  "spark": {
+   "x": 1561,
+   "y": 2210,
+   "w": 20,
+   "h": 20,
+   "gameW": 10,
+   "gameH": 10,
+   "label": "Wand spark"
+  },
+  "magic": {
+   "x": 1795,
+   "y": 2210,
+   "w": 24,
+   "h": 24,
+   "gameW": 12,
+   "gameH": 12,
+   "label": "Staff bolt"
+  },
+  "fireball": {
+   "x": 135,
+   "y": 2340,
+   "w": 40,
+   "h": 40,
+   "gameW": 20,
+   "gameH": 20,
+   "label": "Fireball"
+  },
+  "spectral": {
+   "x": 357,
+   "y": 2340,
+   "w": 68,
+   "h": 24,
+   "gameW": 34,
+   "gameH": 12,
+   "label": "Spectral sword"
+  },
+  "aurafist": {
+   "x": 607,
+   "y": 2340,
+   "w": 40,
+   "h": 40,
+   "gameW": 20,
+   "gameH": 20,
+   "label": "Aura fist"
+  },
+  "auraorb": {
+   "x": 845,
+   "y": 2340,
+   "w": 36,
+   "h": 36,
+   "gameW": 18,
+   "gameH": 18,
+   "label": "Aura orb"
+  },
+  "reflect": {
+   "x": 1085,
+   "y": 2340,
+   "w": 28,
+   "h": 28,
+   "gameW": 14,
+   "gameH": 14,
+   "label": "Reflected shot"
+  },
+  "bomb": {
+   "x": 1317,
+   "y": 2340,
+   "w": 36,
+   "h": 36,
+   "gameW": 18,
+   "gameH": 18,
+   "label": "Paper bomb"
+  },
+  "ebullet": {
+   "x": 1557,
+   "y": 2340,
+   "w": 28,
+   "h": 28,
+   "gameW": 14,
+   "gameH": 14,
+   "label": "Enemy ink shot"
+  },
+  "firebolt": {
+   "x": 1791,
+   "y": 2340,
+   "w": 32,
+   "h": 32,
+   "gameW": 16,
+   "gameH": 16,
+   "label": "Pyre fire bolt"
+  },
+  "coin": {
+   "x": 145,
+   "y": 2466,
+   "w": 20,
+   "h": 20,
+   "gameW": 10,
+   "gameH": 10,
+   "label": "Coin"
+  },
+  "weapon_sword": {
+   "x": 60,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Blacksmith's First Sword",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_longsword": {
+   "x": 298,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Longsword",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_dragonsteel": {
+   "x": 536,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Dragonsteel Longsword",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_enchantedSword": {
+   "x": 774,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Enchanted Sword",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_martialScroll1": {
+   "x": 1012,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "1st Martial Arts Scroll",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_martialScroll2": {
+   "x": 1250,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "2nd Martial Arts Scroll",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_auraScroll1": {
+   "x": 1488,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "1st Aura Scroll",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_auraScroll2": {
+   "x": 1726,
+   "y": 2682,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "2nd Aura Scroll",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_bow": {
+   "x": 60,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Short Bow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_longbow": {
+   "x": 298,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Long Bow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_crossbow": {
+   "x": 536,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Crossbow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_manaBow": {
+   "x": 774,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Mana Bow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_hunterKnife": {
+   "x": 1012,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Hunter Knife",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_tomahawk": {
+   "x": 1250,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Tomahawk",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_doubleTomahawk": {
+   "x": 1488,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Double Tomahawk",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_winchester": {
+   "x": 1726,
+   "y": 2880,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Winchester",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_cripplingCrossbow": {
+   "x": 60,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Crippling Crossbow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_devourerSword": {
+   "x": 298,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Devourer Sword",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_dorsalBow": {
+   "x": 536,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Dorsal Bow",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_staff": {
+   "x": 774,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Mage Staff",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_wand": {
+   "x": 1012,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Wand",
+   "handX": 24,
+   "handY": 28
+  },
+  "weapon_buckler": {
+   "x": 1250,
+   "y": 3078,
+   "w": 192,
+   "h": 112,
+   "gameW": 96,
+   "gameH": 56,
+   "label": "Buckler",
+   "handX": 24,
+   "handY": 28
+  },
+  "block_1": {
+   "x": 91,
+   "y": 3386,
+   "w": 128,
+   "h": 128,
+   "gameW": 64,
+   "gameH": 64,
+   "label": "Obstacle A"
+  },
+  "block_2": {
+   "x": 327,
+   "y": 3386,
+   "w": 128,
+   "h": 128,
+   "gameW": 64,
+   "gameH": 64,
+   "label": "Obstacle B"
+  },
+  "block_3": {
+   "x": 563,
+   "y": 3386,
+   "w": 128,
+   "h": 128,
+   "gameW": 64,
+   "gameH": 64,
+   "label": "Obstacle C"
+  },
+  "hatch": {
+   "x": 811,
+   "y": 3386,
+   "w": 104,
+   "h": 104,
+   "gameW": 52,
+   "gameH": 52,
+   "label": "Exit hatch"
+  },
+  "door_top": {
+   "x": 1004,
+   "y": 3386,
+   "w": 384,
+   "h": 128,
+   "gameW": 192,
+   "gameH": 64,
+   "label": "Closed door TOP"
+  },
+  "door_bottom": {
+   "x": 1434,
+   "y": 3386,
+   "w": 384,
+   "h": 128,
+   "gameW": 192,
+   "gameH": 64,
+   "label": "Closed door BOTTOM"
+  },
+  "door_left": {
+   "x": 91,
+   "y": 3600,
+   "w": 128,
+   "h": 256,
+   "gameW": 64,
+   "gameH": 128,
+   "label": "Closed door LEFT"
+  },
+  "door_right": {
+   "x": 327,
+   "y": 3600,
+   "w": 128,
+   "h": 256,
+   "gameW": 64,
+   "gameH": 128,
+   "label": "Closed door RIGHT"
+  },
+  "wall_top": {
+   "x": 532,
+   "y": 3600,
+   "w": 384,
+   "h": 128,
+   "gameW": 192,
+   "gameH": 64,
+   "label": "No door: wall TOP"
+  },
+  "wall_bottom": {
+   "x": 962,
+   "y": 3600,
+   "w": 384,
+   "h": 128,
+   "gameW": 192,
+   "gameH": 64,
+   "label": "No door: wall BOTTOM"
+  },
+  "wall_left": {
+   "x": 1423,
+   "y": 3600,
+   "w": 128,
+   "h": 256,
+   "gameW": 64,
+   "gameH": 128,
+   "label": "No door: wall LEFT"
+  },
+  "wall_right": {
+   "x": 1659,
+   "y": 3600,
+   "w": 128,
+   "h": 256,
+   "gameW": 64,
+   "gameH": 128,
+   "label": "No door: wall RIGHT"
+  },
+  "room": {
+   "x": 60,
+   "y": 4052,
+   "w": 1920,
+   "h": 1280,
+   "gameW": 960,
+   "gameH": 640,
+   "label": "Room background"
+  }
+ }
+}

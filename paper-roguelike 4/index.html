@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>PaperGame</title>
+  <!-- phones: "Add to Home Screen" = full screen app that also works offline -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2b2622">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="PaperGame">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #2b2622; overflow: hidden;
+                 touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    #game { width: 100%; height: 100%; }
+    /* phones held upright: ask to turn sideways */
+    #rotate { display: none; position: fixed; inset: 0; z-index: 100; background: #fdf6e3; color: #37474f;
+              font: bold 22px Arial, sans-serif; text-align: center; padding-top: 40vh; }
+    @media (orientation: portrait) and (pointer: coarse) { #rotate { display: block; } }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <div id="rotate">&#8635;<br>Turn your phone sideways</div>
+
+  <!-- Order matters: Phaser first, then our files, main.js last. No modules, no CDN. -->
+  <script src="phaser.min.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/mobile.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/skills.js"></script>
+  <script src="js/gear3.js"></script>
+  <script src="js/arcane.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/projectiles.js"></script>
+  <script src="js/coins.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/foes2.js"></script>
+  <script src="js/bosses.js"></script>
+  <script src="js/allies.js"></script>
+  <script src="js/arcane3b.js"></script>
+  <script src="js/hazards.js"></script>
+  <script src="js/chains.js"></script>
+  <script src="js/throwables.js"></script>
+  <script src="js/rooms.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/inventory.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/stages.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/meta.js"></script>
+  <script src="js/menus.js"></script>
+  <script src="js/bestiary.js"></script>
+  <script src="js/runmenus.js"></script>
+  <script src="js/specials.js"></script>
+  <script src="js/debug.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
