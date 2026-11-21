@@ -1,0 +1,292 @@
+<meta charset="utf-8">
+<title>PaperGame Balance Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a notebook page. Ruled paper, a red margin line down the left, the tab bar as index tabs on top. */
+:root {
+  --paper: #f7f2e6; --paper-2: #efe8d6; --ink: #263238; --ink-2: #5d6b73; --rule: #b9d0ea; --margin: #d9534f;
+  --line: #ddd3bd; --hi: #fff6bf;
+  --melee: #b23a2e; --precision: #2e7d32; --arcane: #3949ab; --boss: #6a1b9a; --any: #6d5d4b;
+  --up: #2e7d32; --down: #c62828; --new: #1565c0;
+  --f-display: 'Kalam', 'Comic Sans MS', cursive; --f-body: 'IBM Plex Sans', system-ui, sans-serif; --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d2128; --paper-2: #252a33; --ink: #e8e3d6; --ink-2: #a5acb5; --rule: #2f3d52; --margin: #e57373;
+  --line: #343b46; --hi: #3d3720;
+  --melee: #ef8a7f; --precision: #81c784; --arcane: #9fa8ff; --boss: #ce93d8; --any: #c2b29b;
+  --up: #81c784; --down: #ef9a9a; --new: #90caf9; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d2128; --paper-2: #252a33; --ink: #e8e3d6; --ink-2: #a5acb5; --rule: #2f3d52; --margin: #e57373;
+  --line: #343b46; --hi: #3d3720;
+  --melee: #ef8a7f; --precision: #81c784; --arcane: #9fa8ff; --boss: #ce93d8; --any: #c2b29b;
+  --up: #81c784; --down: #ef9a9a; --new: #90caf9; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
+.page { max-width: 1400px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: end; gap: 8px 24px; border-bottom: 2px solid var(--margin); padding-bottom: 10px; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: 2.2rem; line-height: 1; margin: 0; text-wrap: balance; }
+.meta { color: var(--ink-2); font-size: 0.9rem; }
+.meta b { color: var(--ink); font-weight: 600; }
+nav { display: flex; flex-wrap: wrap; gap: 4px; margin: 16px 0 0; }
+nav button { font: 600 0.9rem var(--f-body); color: var(--ink-2); background: var(--paper-2); border: 1px solid var(--line); border-bottom: none;
+  border-radius: 8px 8px 0 0; padding: 7px 12px; cursor: pointer; }
+nav button[aria-selected="true"] { background: var(--paper); color: var(--ink); border-color: var(--margin); box-shadow: inset 0 3px 0 var(--margin); }
+nav button .n { font: 500 0.75rem var(--f-mono); color: var(--ink-2); margin-left: 4px; }
+nav button:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible, th button:focus-visible { outline: 2px solid var(--new); outline-offset: 2px; }
+.sheet { border: 1px solid var(--line); border-radius: 0 8px 8px 8px; padding: 14px; background:
+  repeating-linear-gradient(to bottom, transparent 0 27px, var(--rule) 27px 28px), var(--paper); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.tools input[type=search] { flex: 1 1 220px; min-width: 0; font: 0.95rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; }
+.tools select { font: 0.9rem var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+.chip { font: 600 0.8rem var(--f-body); border: 1px solid var(--line); background: var(--paper); color: var(--ink-2); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.count { color: var(--ink-2); font-size: 0.85rem; margin-left: auto; }
+.wrap { overflow-x: auto; border-left: 2px solid var(--margin); }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; background: var(--paper); }
+th { position: sticky; top: 0; background: var(--paper-2); text-align: left; font: 600 0.78rem var(--f-body); text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); border-bottom: 1px solid var(--line); padding: 0; white-space: nowrap; }
+th button { all: unset; display: block; padding: 8px 10px; cursor: pointer; width: 100%; box-sizing: border-box; }
+th button::after { content: attr(data-sort); margin-left: 4px; color: var(--margin); }
+td { border-bottom: 1px solid var(--line); padding: 7px 10px; vertical-align: top; }
+td.num { text-align: right; font-family: var(--f-mono); white-space: nowrap; }
+td.desc { color: var(--ink-2); font-size: 0.85rem; min-width: 260px; max-width: 460px; }
+td.notes { font-size: 0.82rem; min-width: 180px; }
+tr.changed td:first-child { box-shadow: inset 4px 0 0 var(--new); }
+tr.changed { background: color-mix(in srgb, var(--hi) 55%, transparent); }
+.name { font-weight: 600; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.tag { font: 500 0.68rem var(--f-mono); color: var(--ink-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.tag.chg { color: var(--new); border-color: var(--new); }
+.cls { font-weight: 600; white-space: nowrap; }
+.cls[data-c="melee"] { color: var(--melee); } .cls[data-c="precision"] { color: var(--precision); }
+.cls[data-c="arcane"] { color: var(--arcane); } .cls[data-c="boss"] { color: var(--boss); } .cls[data-c="any"] { color: var(--any); }
+.sub { display: block; color: var(--ink-2); font-weight: 400; font-size: 0.82rem; }
+.tier { color: #c28a00; letter-spacing: 1px; white-space: nowrap; }
+.empty { padding: 40px 12px; text-align: center; color: var(--ink-2); font-family: var(--f-display); font-size: 1.3rem; }
+.chg-list { display: grid; gap: 10px; }
+.chg-item { border: 1px solid var(--line); border-left: 4px solid var(--new); border-radius: 6px; padding: 10px 12px; background: var(--paper); min-width: 0; }
+.chg-item[data-w="added"] { border-left-color: var(--up); } .chg-item[data-w="removed"] { border-left-color: var(--down); }
+.chg-item h3 { margin: 0 0 4px; font-size: 1rem; } .chg-item .w { font: 500 0.75rem var(--f-mono); color: var(--ink-2); text-transform: uppercase; margin-left: 6px; }
+.diff { font-size: 0.85rem; display: grid; gap: 2px; overflow-wrap: anywhere; }
+.diff del { color: var(--down); } .diff ins { color: var(--up); text-decoration: none; }
+.note { color: var(--ink-2); font-size: 0.85rem; margin: 10px 0 0; max-width: 70ch; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.two > div { min-width: 0; }
+h2 { font-family: var(--f-display); font-size: 1.4rem; margin: 4px 0 8px; }
+th .thl, .thl { display: block; padding: 8px 10px; }
+th.grp { text-align: center; border-left: 1px solid var(--line); }
+.covtab td.cov { text-align: center; font-family: var(--f-mono); }
+.covtab td.gap { color: var(--down); font-weight: 600; background: color-mix(in srgb, var(--down) 10%, transparent); }
+.gapword { color: var(--down); font-weight: 600; }
+.pickrow { cursor: pointer; } .pickrow:hover td { background: var(--paper-2); }
+.pickrow.picked td { background: color-mix(in srgb, var(--hi) 70%, transparent); }
+.pickrow:focus-visible { outline: 2px solid var(--new); outline-offset: -2px; }
+.dtab { table-layout: fixed; min-width: 760px; } .dtab td.desc { min-width: 0; max-width: none; }
+.detail { margin-top: 18px; border-top: 2px solid var(--margin); padding-top: 10px; scroll-margin-top: 12px; }
+.dh { font-size: 1rem; margin: 14px 0 6px; } .dh .n { font: 500 0.75rem var(--f-mono); color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="page">
+  <header>
+    <h1>PaperGame Balance Sheet</h1>
+    <div class="meta" id="meta">Loading the numbers from the game…</div>
+  </header>
+  <nav id="tabs" role="tablist" aria-label="What to look at"></nav>
+  <section class="sheet" id="sheet" role="tabpanel">
+    <div class="empty">Loading the latest build…</div>
+  </section>
+</div>
+
+<script>
+const CLASS_NAMES = { melee: 'Melee', precision: 'Precision', arcane: 'Arcane', boss: 'Boss loot', any: 'Anyone' };
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const tier = (t) => t === 'boss' ? '<span class="tier" title="Boss loot">◆</span>' : t ? '<span class="tier">' + '★'.repeat(t) + '</span>' : '';
+const cls = (r) => { const c = r.class || 'any'; return '<span class="cls" data-c="' + c + '">' + esc(CLASS_NAMES[c] || c) + (r.sub ? '<span class="sub">' + esc(r.sub) + '</span>' : '') + '</span>'; };
+const n = (v) => v == null || v === '' ? '' : (typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(1)) : esc(v));
+const nameCell = (r) => '<div class="name">' + esc(r.name) + '</div>' + ((r.flags && r.flags.length) || r._chg ? '<div class="tags">' +
+  (r._chg ? '<span class="tag chg">' + r._chg + '</span>' : '') + (r.flags || []).map((f) => '<span class="tag">' + esc(f) + '</span>').join('') + '</div>' : '');
+
+// Column specs per tab: [header, key (for sorting), cell renderer, td class]
+const TABS = [
+  { id: 'subclass', label: 'By subclass' },
+  { id: 'weapons', label: 'Weapons', filters: true, cols: [
+    ['Weapon', 'name', nameCell], ['Class', 'sub', cls], ['Type', 'type', (r) => esc(r.type)], ['Tier', 'tier', (r) => tier(r.tier)],
+    ['Price', 'price', (r) => n(r.price), 'num'], ['Dmg', 'dmg', (r) => n(r.dmg), 'num'], ['Rate/s', 'rate', (r) => n(r.rate), 'num'],
+    ['DPS', 'dps', (r) => r.dps ? '<b>' + n(r.dps) + '</b>' : '', 'num'], ['Mana', 'mana', (r) => n(r.mana), 'num'],
+    ['Key numbers', null, (r) => (r.notes || []).map(esc).join('<br>'), 'notes'], ['Description', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'armor', label: 'Armour', filters: true, cols: [
+    ['Armour', 'name', nameCell], ['Class', 'sub', cls], ['Tier', 'tier', (r) => tier(r.tier)], ['Price', 'price', (r) => n(r.price), 'num'],
+    ['Stats', null, (r) => esc(r.stats) + (r.classStats ? '<br><i>' + esc(r.classStats) + '</i>' : ''), 'notes'], ['Description', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'skills', label: 'Skills', filters: true, cols: [
+    ['Skill', 'name', nameCell], ['Class', 'sub', cls], ['Tier', 'tier', (r) => tier(r.tier)], ['Price', 'price', (r) => n(r.price), 'num'],
+    ['Mana', 'mana', (r) => n(r.mana), 'num'], ['CD (s)', 'cd', (r) => n(r.cd), 'num'], ['Dmg', 'dmg', (r) => n(r.dmg), 'num'],
+    ['Effect stats', null, (r) => esc(r.effect), 'notes'], ['Description', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'items', label: 'Items', filters: true, cols: [
+    ['Item', 'name', nameCell], ['For', 'sub', cls], ['Price', 'price', (r) => n(r.price), 'num'], ['Per buy', 'amount', (r) => n(r.amount), 'num'],
+    ['Effect', null, (r) => esc(r.effect), 'notes'], ['Description', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'sets', label: 'Set bonuses', cols: [
+    ['Subclass', 'name', nameCell], ['2 items', null, (r) => esc(r.two), 'notes'], ['4 items', null, (r) => esc(r.four), 'notes'], ['6 items', null, (r) => esc(r.six), 'notes']] },
+  { id: 'buffs', label: 'Passive buffs', cols: [
+    ['Buff', 'name', nameCell], ['Stat change', null, (r) => esc(r.stats), 'notes'], ['Description', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'pencil', label: 'Pencil Case', cols: [
+    ['Upgrade', 'name', nameCell], ['Path', 'path', (r) => esc(r.path)], ['Ranks', 'ranks', (r) => n(r.ranks), 'num'], ['Cost per rank', null, (r) => esc(r.costs), 'num'],
+    ['Total', 'total', (r) => '<b>' + n(r.total) + '</b>', 'num'], ['Needs', null, (r) => esc(r.needs), 'notes'], ['Effect', null, (r) => esc(r.desc), 'desc']] },
+  { id: 'enemies', label: 'Enemies', cols: [
+    ['Enemy', 'name', nameCell], ['Kind', 'kind', (r) => esc(r.kind)], ['Where', 'where', (r) => esc(r.where), 'notes'], ['HP', 'hp', (r) => n(r.hp), 'num'],
+    ['Speed', 'speed', (r) => n(r.speed), 'num'], ['Touch', 'touch', (r) => n(r.touch), 'num'], ['Attacks', null, (r) => esc(r.hits), 'notes'],
+    ['Cost', 'cost', (r) => n(r.cost), 'num'], ['Size', 'size', (r) => n(r.size), 'num'], ['Special', null, (r) => esc(r.special), 'notes']] },
+  { id: 'rules', label: 'Rules & scaling' },
+  { id: 'changes', label: 'Changes' }
+];
+
+let DATA = null, state = { tab: 'subclass', pick: null, q: '', cls: 'all', sub: 'all', tier: 'all', sort: null, dir: 1 };
+try { const s = JSON.parse(localStorage.getItem('balance-ui') || 'null'); if (s && s.tab) state = Object.assign(state, { tab: s.tab }); } catch (e) {}
+if (location.hash && TABS.some((t) => '#' + t.id === location.hash)) state.tab = location.hash.slice(1);
+
+function changedMap() {
+  const m = {};
+  for (const c of (DATA.changes || [])) m[c.tab + ':' + c.id] = c.what === 'added' ? 'new' : c.what === 'changed' ? 'changed: ' + c.fields.join(', ') : c.what;
+  return m;
+}
+
+function renderTabs() {
+  const nav = document.getElementById('tabs');
+  nav.innerHTML = TABS.map((t) => {
+    const cnt = t.id === 'changes' ? (DATA.changes || []).length : (t.id === 'rules' || t.id === 'subclass') ? '' : (DATA.tabs[t.id] || []).length;
+    return '<button role="tab" id="tab-' + t.id + '" aria-selected="' + (state.tab === t.id) + '" data-tab="' + t.id + '">' + t.label + (cnt !== '' ? '<span class="n">' + cnt + '</span>' : '') + '</button>';
+  }).join('');
+  nav.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    state.tab = b.dataset.tab; state.q = ''; state.cls = 'all'; state.sub = 'all'; state.tier = 'all'; state.sort = null;
+    try { localStorage.setItem('balance-ui', JSON.stringify({ tab: state.tab })); } catch (e) {}
+    history.replaceState(null, '', '#' + state.tab);
+    renderTabs(); render();
+  }));
+}
+
+function render() {
+  const t = TABS.find((x) => x.id === state.tab) || TABS[0], el = document.getElementById('sheet');
+  if (t.id === 'changes') return renderChanges(el);
+  if (t.id === 'rules') return renderRules(el);
+  if (t.id === 'subclass') return renderSubclass(el);
+  const chg = changedMap();
+  let rows = (DATA.tabs[t.id] || []).map((r) => Object.assign({}, r, { _chg: chg[t.id + ':' + r.id] }));
+  const all = rows.length;
+  // filters
+  let tools = '<div class="tools"><input type="search" id="q" placeholder="Search names and descriptions" value="' + esc(state.q) + '" aria-label="Search">';
+  if (t.filters) {
+    const classes = ['all'].concat(['melee', 'precision', 'arcane', 'boss', 'any'].filter((c) => rows.some((r) => (r.class || 'any') === c)));
+    tools += classes.map((c) => '<button class="chip" data-cls="' + c + '" aria-pressed="' + (state.cls === c) + '">' + (c === 'all' ? 'All' : CLASS_NAMES[c]) + '</button>').join('');
+    if (state.cls !== 'all') {
+      const subs = [...new Set(rows.filter((r) => (r.class || 'any') === state.cls && r.sub).map((r) => r.sub))].sort();
+      tools += '<select id="sub" aria-label="Subclass"><option value="all">Every subclass</option>' + subs.map((s) => '<option' + (state.sub === s ? ' selected' : '') + '>' + esc(s) + '</option>').join('') + '</select>';
+    }
+    if (rows.some((r) => r.tier)) tools += '<select id="tier" aria-label="Tier"><option value="all">Every tier</option><option value="1"' + (state.tier === '1' ? ' selected' : '') + '>★</option><option value="2"' + (state.tier === '2' ? ' selected' : '') + '>★★</option><option value="3"' + (state.tier === '3' ? ' selected' : '') + '>★★★</option><option value="4"' + (state.tier === '4' ? ' selected' : '') + '>★★★★</option><option value="boss"' + (state.tier === 'boss' ? ' selected' : '') + '>◆ boss loot</option></select>';
+  }
+  if (state.cls !== 'all') rows = rows.filter((r) => (r.class || 'any') === state.cls);
+  if (state.sub !== 'all') rows = rows.filter((r) => r.sub === state.sub);
+  if (state.tier !== 'all') rows = rows.filter((r) => String(r.tier) === state.tier);
+  if (state.q) { const q = state.q.toLowerCase(); rows = rows.filter((r) => JSON.stringify(r).toLowerCase().includes(q)); }
+  if (state.sort) {
+    const k = state.sort;
+    rows.sort((a, b) => { const x = a[k], y = b[k]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y))) * state.dir; });
+  }
+  tools += '<span class="count">' + rows.length + (rows.length !== all ? ' of ' + all : '') + ' shown · highlighted = changed since ' + esc(DATA.previous || 'the last build') + '</span></div>';
+  const head = '<tr>' + t.cols.map((c) => '<th>' + (c[1] ? '<button data-sort-key="' + c[1] + '" data-sort="' + (state.sort === c[1] ? (state.dir > 0 ? '▲' : '▼') : '') + '">' + c[0] + '</button>' : '<span style="display:block;padding:8px 10px">' + c[0] + '</span>') + '</th>').join('') + '</tr>';
+  const body = rows.map((r) => '<tr' + (r._chg ? ' class="changed"' : '') + '>' + t.cols.map((c) => '<td' + (c[3] ? ' class="' + c[3] + '"' : '') + '>' + c[2](r) + '</td>').join('') + '</tr>').join('');
+  el.innerHTML = tools + '<div class="wrap"><table><thead>' + head + '</thead><tbody>' + (body || '<tr><td colspan="' + t.cols.length + '" class="empty">Nothing matches.</td></tr>') + '</tbody></table></div>';
+  const q = document.getElementById('q');
+  q.addEventListener('input', () => { state.q = q.value; const pos = q.selectionStart; render(); const q2 = document.getElementById('q'); q2.focus(); q2.setSelectionRange(pos, pos); });
+  el.querySelectorAll('.chip').forEach((b) => b.addEventListener('click', () => { state.cls = b.dataset.cls; state.sub = 'all'; render(); }));
+  const s = document.getElementById('sub'); if (s) s.addEventListener('change', () => { state.sub = s.value; render(); });
+  const tr = document.getElementById('tier'); if (tr) tr.addEventListener('change', () => { state.tier = tr.value; render(); });
+  el.querySelectorAll('th button').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.sortKey; if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = ['name', 'sub', 'type', 'path', 'kind', 'where'].includes(k) ? 1 : -1; } render();
+  }));
+}
+
+// Every subclass × (category, tier): what exists and what's missing. Click a row for everything it has.
+function renderSubclass(el) {
+  const T = DATA.tabs, cats = [['weapons', 'Weapons'], ['armor', 'Armour'], ['skills', 'Skills']];
+  const subs = {};
+  const add = (r, cat) => {
+    if (!r.sub || r.sub === 'Any') return;
+    const k = r.sub, s = (subs[k] = subs[k] || { sub: k, cls: r.class || 'any', rows: [] });
+    if (r.tier === 'boss') s.cls = 'boss';               // a boss's loot set (Bookworm, Warden...) isn't a class to fill
+    s.rows.push(Object.assign({ _cat: cat }, r));
+  };
+  for (const [c] of cats) (T[c] || []).forEach((r) => add(r, c));
+  (T.items || []).forEach((r) => add(r, 'items'));
+  const sets = {}; (T.sets || []).forEach((s) => { sets[s.name] = s; });
+  const order = { melee: 0, precision: 1, arcane: 2, boss: 3, any: 4 };
+  const list = Object.values(subs).sort((a, b) => order[a.cls] - order[b.cls] || a.sub.localeCompare(b.sub));
+  const tiers = [1, 2, 3, 4];
+  const cell = (n, need) => '<td class="num cov' + (n === 0 && need ? ' gap' : '') + '">' + (n || (need ? '0' : '·')) + '</td>';
+  let head = '<tr><th rowspan="2"><span class="thl">Subclass</span></th>' + cats.map(([, l]) => '<th colspan="' + tiers.length + '" class="grp"><span class="thl">' + l + '</span></th>').join('') +
+    '<th rowspan="2"><span class="thl">Items</span></th><th rowspan="2"><span class="thl">Set bonus</span></th><th rowspan="2"><span class="thl">Total</span></th></tr><tr>' +
+    cats.map(() => tiers.map((t) => '<th class="num"><span class="thl">' + '★'.repeat(t) + '</span></th>').join('')).join('') + '</tr>';
+  let body = '';
+  for (const s of list) {
+    const boss = s.cls === 'boss';
+    const count = (cat, t) => s.rows.filter((r) => r._cat === cat && (r.tier === t)).length;
+    body += '<tr class="pickrow' + (state.pick === s.sub ? ' picked' : '') + '" data-sub="' + esc(s.sub) + '" tabindex="0"><td><span class="cls" data-c="' + s.cls + '">' + esc(s.sub) + '<span class="sub">' + esc(CLASS_NAMES[s.cls] || s.cls) + '</span></span></td>' +
+      cats.map(([c]) => boss ? '<td class="num cov" colspan="' + tiers.length + '">' + s.rows.filter((r) => r._cat === c).length + '</td>' : tiers.map((t) => cell(count(c, t), (c !== 'armor' || t === 1) && t <= 3)).join('')).join('') +
+      cell(s.rows.filter((r) => r._cat === 'items').length, !boss) + '<td class="cov">' + (sets[s.sub] ? '✓' : (boss ? '·' : '<span class="gapword">none</span>')) + '</td>' +
+      '<td class="num"><b>' + s.rows.length + '</b></td></tr>';
+  }
+  let detail = '';
+  const pick = list.find((s) => s.sub === state.pick);
+  if (pick) {
+    const chg = changedMap();
+    const block = (cat, label, cols) => {
+      const rows = pick.rows.filter((r) => r._cat === cat).sort((a, b) => (a.tier === 'boss' ? 9 : a.tier || 0) - (b.tier === 'boss' ? 9 : b.tier || 0) || (a.price || 0) - (b.price || 0));
+      if (!rows.length) return '<h3 class="dh">' + label + ' <span class="gapword">none</span></h3>';
+      return '<h3 class="dh">' + label + ' <span class="n">' + rows.length + '</span></h3><div class="wrap"><table class="dtab"><colgroup><col style="width:24%"><col style="width:9%"><col style="width:7%"><col style="width:26%"><col style="width:34%"></colgroup><tbody>' + rows.map((r) => {
+        r._chg = chg[cat + ':' + r.id];
+        return '<tr' + (r._chg ? ' class="changed"' : '') + '><td>' + nameCell(r) + '</td><td>' + tier(r.tier) + '</td><td class="num">' + n(r.price) + '</td><td class="notes">' + cols(r) + '</td><td class="desc">' + esc(r.desc) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    };
+    const st = sets[pick.sub];
+    detail = '<div class="detail"><h2>' + esc(pick.sub) + ' <span class="cls" data-c="' + pick.cls + '" style="font-size:0.9rem">' + esc(CLASS_NAMES[pick.cls] || '') + '</span></h2>' +
+      block('weapons', 'Weapons', (r) => (r.dps ? '<b>~' + n(r.dps) + ' DPS</b> · ' : '') + (r.dmg ? 'dmg ' + n(r.dmg) : '') + (r.mana ? ' · mana ' + n(r.mana) : '')) +
+      block('armor', 'Armour', (r) => esc(r.stats)) +
+      block('skills', 'Skills', (r) => [r.mana ? 'mana ' + n(r.mana) : '', r.cd ? 'CD ' + n(r.cd) + ' s' : '', r.dmg ? 'dmg ' + n(r.dmg) : '', esc(r.effect)].filter(Boolean).join(' · ')) +
+      block('items', 'Items', (r) => esc(r.effect)) +
+      '<h3 class="dh">Set bonus</h3>' + (st ? '<p class="note" style="margin-top:0">2 items: ' + esc(st.two) + '<br>4 items: ' + esc(st.four) + '<br>6 items: ' + esc(st.six) + '</p>' : '<p class="note" style="margin-top:0"><span class="gapword">none</span></p>') + '</div>';
+  }
+  el.innerHTML = '<p class="note" style="margin-top:0">How much each subclass has, by star tier. <span class="gapword">Red</span> = a gap worth filling (armour only needs a ★ one). Click a subclass to see everything it has: weapons, armour, skills, items and set bonus together.</p>' +
+    '<div class="wrap"><table class="covtab"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' + detail;
+  el.querySelectorAll('.pickrow').forEach((r) => {
+    const go = () => { state.pick = state.pick === r.dataset.sub ? null : r.dataset.sub; render(); const d = document.querySelector('.detail'); if (d) d.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+    r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+}
+
+function renderRules(el) {
+  const R = DATA.tabs.rules || [], S = DATA.tabs.scaling || [];
+  el.innerHTML = '<div class="two"><div><h2>Game rules</h2><div class="wrap"><table><thead><tr><th><span style="display:block;padding:8px 10px">Rule</span></th><th><span style="display:block;padding:8px 10px">Numbers</span></th></tr></thead><tbody>' +
+    R.map((r) => '<tr><td class="name">' + esc(r.name) + '</td><td>' + esc(r.value) + '</td></tr>').join('') + '</tbody></table></div></div>' +
+    '<div><h2>Enemy scaling by level</h2><div class="wrap"><table><thead><tr>' + ['Level', 'HP ×', 'Damage ×', 'Room budget'].map((h) => '<th><span style="display:block;padding:8px 10px">' + h + '</span></th>').join('') + '</tr></thead><tbody>' +
+    S.map((r) => '<tr><td class="num">' + r.level + '</td><td class="num">' + r.hp.toFixed(2) + '</td><td class="num">' + r.dmg.toFixed(2) + '</td><td class="num">' + r.budget + '</td></tr>').join('') +
+    '</tbody></table></div><p class="note">Two levels per section: Notebook 1–2, Sewers or Castle 3–4, Necrotery 5–6. Enemy HP and damage in the Enemies tab are level-1 values; multiply by this table. The room budget is how many enemy "cost" points a fight room spends.</p></div></div>';
+}
+
+function renderChanges(el) {
+  const C = DATA.changes || [];
+  const tabName = (id) => (TABS.find((t) => t.id === id) || {}).label || id;
+  if (!C.length) { el.innerHTML = '<div class="empty">No changes since ' + esc(DATA.previous || 'the last build') + '.</div>'; return; }
+  const show = (v) => typeof v === 'object' && v !== null ? esc(JSON.stringify(v)) : esc(v);
+  el.innerHTML = '<p class="note" style="margin-top:0">Everything that changed in <b>' + esc(DATA.build) + '</b> compared with <b>' + esc(DATA.previous) + '</b>.</p><div class="chg-list">' +
+    C.map((c) => '<div class="chg-item" data-w="' + c.what + '"><h3>' + esc(c.name) + '<span class="w">' + esc(tabName(c.tab)) + ' · ' + c.what + '</span></h3>' +
+      (c.what === 'changed' ? '<div class="diff">' + c.fields.map((f) => '<div><b>' + esc(f) + ':</b> <del>' + show(c.before[f]) + '</del> → <ins>' + show(c.after[f]) + '</ins></div>').join('') + '</div>' : '') + '</div>').join('') + '</div>';
+}
+
+fetch('data.json').then((r) => r.json()).then((d) => {
+  DATA = d;
+  document.getElementById('meta').innerHTML = 'Build <b>' + esc(d.build) + '</b> · updated ' + esc(d.date) + (d.previous ? ' · compared with ' + esc(d.previous) : '') + ' · read straight from the game code';
+  renderTabs(); render();
+}).catch(() => { document.getElementById('sheet').innerHTML = '<div class="empty">Couldn\'t load the numbers. Reload the page to try again.</div>'; });
+window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (DATA && TABS.some((t) => t.id === id) && id !== state.tab) { state.tab = id; renderTabs(); render(); } });
+</script>
