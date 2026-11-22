@@ -151,6 +151,7 @@ class TouchController {
       this.menu.px = p.x; this.menu.py = p.y; this.menu.pointerMoved = true;
       return;
     }
+    if (this.scene.testPanel && this.scene.testPanel.contains(p)) return;   // tapping the Test Dungeon panel
     const b = this.buttonAt(p.x, p.y);
     if (b) {
       this.btnT[p.id] = b;

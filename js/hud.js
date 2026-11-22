@@ -624,6 +624,44 @@ class Hud {
     }
   }
 
+  // Harp strum: a pink smear of sound, three white streaks sweeping through it, and music notes flying out.
+  drawHarpSwing(g, w, d, x, y) {
+    const k0 = Math.max(0, w.swingFxMs / d.swingFxMs), t = 1 - k0, k = Math.min(1, k0 * 1.8);   // stays bold, fades at the end
+    const r = d.range + 10, ha = d.arcDeg * Math.PI / 360, a0 = w.swingAngle;
+    const sweep = Math.min(1, t * 2.2);                              // the streaks sweep across in the first half
+    const from = a0 - ha, to = from + 2 * ha * sweep;
+    // the smear: a thick band between two arcs
+    const band = (r1, r2, a1, a2, col, al) => {
+      const pts = [], n = 14;
+      for (let i = 0; i <= n; i++) { const a = a1 + (a2 - a1) * i / n; pts.push({ x: x + Math.cos(a) * r2, y: y + Math.sin(a) * r2 }); }
+      for (let i = n; i >= 0; i--) { const a = a1 + (a2 - a1) * i / n; pts.push({ x: x + Math.cos(a) * r1, y: y + Math.sin(a) * r1 }); }
+      g.fillStyle(col, al); g.fillPoints(pts, true);
+    };
+    band(r * 0.42, r, from, to, 0xc2185b, 0.55 * k);
+    band(r * 0.55, r * 0.92, from + (to - from) * 0.15, to, 0xf06292, 0.6 * k);
+    // three white streaks, the outer ones a little ahead
+    for (let i = 0; i < 3; i++) {
+      const rr = r * (0.62 + i * 0.17), lead = Math.min(1, sweep + i * 0.08);
+      const s0 = from + 2 * ha * Math.max(0, lead - 0.55), s1 = from + 2 * ha * lead;
+      g.lineStyle(5.4 - i * 0.6, 0x880e4f, 0.7 * k);                      // dark edge so it reads on paper too
+      g.beginPath(); g.arc(x, y, rr, s0, s1); g.strokePath();
+      g.lineStyle(3.2 - i * 0.6, 0xffffff, 0.95 * k);
+      g.beginPath(); g.arc(x, y, rr, s0, s1); g.strokePath();
+    }
+    // music notes drifting outward
+    const seed = w.harpSeed || 0;
+    for (let i = 0; i < 5; i++) {
+      const a = from + 2 * ha * ((i + 0.5) / 5 + Math.sin(seed + i * 3.1) * 0.06);
+      if (a > to + 0.05) continue;
+      const rr = r * (0.55 + 0.45 * t + 0.1 * Math.sin(seed * 2 + i)), nx = x + Math.cos(a) * rr, ny = y + Math.sin(a) * rr;
+      g.lineStyle(3.4, 0x880e4f, 0.8 * k); g.lineBetween(nx + 2.6, ny, nx + 2.6, ny - 9); if (i % 2) g.lineBetween(nx + 2.6, ny - 9, nx + 6, ny - 6);
+      g.fillStyle(0x880e4f, 0.8 * k); g.fillEllipse(nx, ny, 8.5, 7);
+      g.fillStyle(0xffffff, 0.95 * k); g.fillEllipse(nx, ny, 6, 4.5);
+      g.lineStyle(1.6, 0xffffff, 0.95 * k); g.lineBetween(nx + 2.6, ny, nx + 2.6, ny - 9);
+      if (i % 2) g.lineBetween(nx + 2.6, ny - 9, nx + 6, ny - 6);
+    }
+  }
+
   // Redrawn only when the room changes or gets cleared.
   drawMinimap(map, current) {
     const g = this.minimap;
@@ -932,7 +970,8 @@ class Hud {
 
       this.drawHeldWeapon(g, p, w, x, y, half, aimA, now);
 
-      if ((d.kind === 'melee' || d.kind === 'boulder' || (d.kind === 'shield' && (d.slam || d.bash))) && w.swingFxMs > 0) this.drawSwing(g, w, d, x, y);
+      if (d.kind === 'harp' && w.swingFxMs > 0) this.drawHarpSwing(g, w, d, x, y);
+      else if ((d.kind === 'melee' || d.kind === 'boulder' || (d.kind === 'shield' && (d.slam || d.bash))) && w.swingFxMs > 0) this.drawSwing(g, w, d, x, y);
 
       if (d.kind === 'shield') {
         const ha = (d.arcDeg / 2) * Math.PI / 180;

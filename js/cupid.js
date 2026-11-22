@@ -33,9 +33,9 @@ Object.assign(STAT_DEFAULTS, { loveTime: 0, heartbreak: 0, loveCharge: 0 });
 /* ---------------- gear ---------------- */
 Object.assign(WEAPON_TYPES, {
   harp: {
-    name: 'Harp', short: 'HARP', kind: 'projectile', class: 'arcane', sub: 'Cupid', type: 'harp', price: 35,
-    desc: 'Sound waves: short range, hits hard\n(24) and passes through enemies.\nSlow to play. Uses mana.',
-    damage: 24, speed: 420, lifetimeMs: 300, fireDelayMs: 760, manaCost: 5, pierce: 99, texture: 'soundwave',
+    name: 'Harp', short: 'HARP', kind: 'harp', class: 'arcane', sub: 'Cupid', type: 'harp', price: 35,
+    desc: 'Strum a wide wave of sound right in\nfront of you: hits everything in the\narc hard (34). Slow to play. Uses mana.',
+    damage: 34, range: 96, arcDeg: 150, cooldownMs: 680, manaCost: 5, knockback: 260, knockbackMs: 130, swingFxMs: 260,
     visual: { style: 'harp', color: 0xffca28, string: 0xfff8e1 }
   },
   heartWand: {
@@ -146,6 +146,20 @@ const CupidTextures = {
       g.fillStyle(0xffffff, 1); g.fillTriangle(0, 0, 6, 4, 0, 4); g.fillTriangle(0, 8, 6, 4, 0, 4);
     });
   }
+};
+
+// Harp: a close-range strum. A wide arc of sound right in front of you (see HUD.drawHarpSwing for the look).
+WEAPON_BEHAVIORS.harp = function (p, w, dt, ctx) {
+  const d = w.def, s = p.stats;
+  if (w.cooldownMs > 0) w.cooldownMs -= dt;
+  if (!p.input.attack || w.cooldownMs > 0) return;
+  if (!p.spendMana(d.manaCost * s.manaCostMul)) return;
+  w.cooldownMs = d.cooldownMs / s.attackSpeedMul;
+  w.swingAngle = Math.atan2(p.input.aimY, p.input.aimX);
+  w.swingKind = 'normal'; w.swingRange = d.range; w.swingArc = d.arcDeg; w.swingFxMs = d.swingFxMs;
+  w.harpSeed = Math.random() * 10;
+  WeaponSystem.meleeArc(p, d, ctx, false, w);
+  if (ctx.lightArc) ctx.lightArc(p, d.range);
 };
 
 /* ---------------- Lovestruck ---------------- */

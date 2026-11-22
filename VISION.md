@@ -18,6 +18,7 @@ Built:
 - [x] Pencil Case perma upgrades, knockoff PS2 controller setup, auto-aim kept
 - [x] Visually distinct stages with their own enemies and bosses (Notebook, Ink Sewers, Paper Castle, Necrotery)
 - [x] The gnome + secret kit
+- [x] Sections: Necrotery graveyard (rain, lightning, breakable tombs, Gargoyles, Demonic Gargoyle mini-boss)
 - [x] Heavy merged into Berserker (owner's call): Tower Shield, Boulder, Earthbreaker hammer, Earthsplitter rock line,
       Thorn Armor, Brotherhood Armor. Low-HP damage boost stays on the axes only.
 - [x] Cupid (Arcane, designed by Nicolas): Harp, Heart Wand, Cupid's Bow, Wing Flap, Cupid's Flight, Cupid's Book

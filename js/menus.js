@@ -86,19 +86,38 @@ const MenuUI = {
   hexColor(str) { return Phaser.Display.Color.HexStringToColor(str).color; }
 };
 
-// Typing "debug" opens the debug menu (main menu and start select).
+// Codes typed on the main menu / start select. "debug" opens the debug menu;
+// other files add their own codes to MENU_CODES. Phones (no keyboard): tap the
+// title 5 times quickly and type the code in the box that pops up.
+const MENU_CODES = {
+  debug(scene) {
+    if (scene.debugMenu) return;
+    scene.debugMenu = new DebugMenu(scene,
+      () => scene.scene.start('GameScene', { weapons: ['bow'], test: true }),
+      () => { scene.debugMenu = null; scene.scene.restart(); });   // restart = show changed save data
+  }
+};
 const DebugHotkey = {
-  attach(scene) {
+  attach(scene, titleTap) {
     scene.typed = '';
     scene.debugMenu = null;
     scene.input.keyboard.on('keydown', (ev) => {
-      if (ev.key && ev.key.length === 1) scene.typed = (scene.typed + ev.key.toLowerCase()).slice(-5);
-      if (scene.typed === 'debug' && !scene.debugMenu) {
-        scene.typed = '';
-        scene.debugMenu = new DebugMenu(scene,
-          () => scene.scene.start('GameScene', { weapons: ['bow'], test: true }),
-          () => { scene.debugMenu = null; scene.scene.restart(); });   // restart = show changed save data
-      }
+      if (!ev.key || ev.key.length !== 1) return;
+      scene.typed = (scene.typed + ev.key.toLowerCase()).slice(-12);
+      for (const code in MENU_CODES) if (scene.typed.endsWith(code)) { scene.typed = ''; MENU_CODES[code](scene); return; }
+    });
+    if (!titleTap) return;
+    let taps = 0, last = 0;
+    const zone = scene.add.zone(GAME_CONFIG.width / 2, 120, 460, 110).setInteractive();
+    zone.on('pointerdown', () => {
+      const now = scene.time.now;
+      taps = now - last < 600 ? taps + 1 : 1; last = now;
+      if (taps < 5) return;
+      taps = 0;
+      let typed = null;
+      try { typed = window.prompt('Code?'); } catch (e) { typed = null; }
+      typed = (typed || '').trim().toLowerCase();
+      if (MENU_CODES[typed]) MENU_CODES[typed](scene);
     });
   }
 };
@@ -140,7 +159,7 @@ class MainMenuScene extends Phaser.Scene {
     MenuUI.button(this, null, W / 2 - 150, 530, 'Export save (file)', () => { SaveData.exportFile(); this.say('Saved to papergame-save.json (check Downloads).'); }, '#6d4c41', 14);
     MenuUI.button(this, null, W / 2 + 10, 530, 'Import save (file)', () => SaveData.importFile((ok, m) => { this.say(m); if (ok) this.time.delayedCall(700, () => this.scene.restart()); }), '#6d4c41', 14);
 
-    DebugHotkey.attach(this);
+    DebugHotkey.attach(this, true);                // + tap the title 5x on phones
     this.input.keyboard.on('keydown-ENTER', () => { if (!this.debugMenu) this.scene.start('WeaponSelectScene', { players: 1 }); });
   }
 

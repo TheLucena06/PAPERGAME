@@ -514,6 +514,7 @@ class GameScene extends Phaser.Scene {
     this.setupBerserker();                       // Earthsplitter rock lines (berserker.js)
     this.setupCupid();                           // Lovestruck, Cupid's Flight trails (cupid.js)
     this.setupMiner();                           // Mine Train, coal smudges (miner.js)
+    this.setupGrave();                           // sections: the Necrotery graveyard (graveyard.js)
     this.setupHunter();                          // traps, hawks, marks (hunter.js)                         // potions on the floor (pickups.js)                            // darkness, torches, burning floors, the Dead Titan (lighting.js, necrotery.js, titan.js)
     this.zones = new ZoneManager(this);          // lasting spell areas (Hurricane, Fire Pillar, storms...)
     // Save data: bestiary pages + kit unlocks (not in the Test Dungeon)
@@ -530,7 +531,7 @@ class GameScene extends Phaser.Scene {
     this.events.once('shutdown', this.cleanup, this);
     const dbg = cfg.debug;
     if (this.testMode) { this.startTestDungeon(); return; }
-    this.extrasRunStart();                       // (extras.js)
+    this.extrasRunStart();
     this.startRun(dbg.startLevel, dbg);
   }
 
@@ -658,6 +659,8 @@ class GameScene extends Phaser.Scene {
       }
     } else if (look.style === 'necro') {
       this.drawNecroFloor(g, W, H, look);
+    } else if (look.style === 'graveyard') {
+      this.drawGraveFloor(g, W, H, look);
     } else if (look.style === 'castle') {
       g.lineStyle(1, look.line, 0.8);
       for (let y = 0, row = 0; y < H; y += 48, row++) {
@@ -896,6 +899,10 @@ class GameScene extends Phaser.Scene {
     if (this.testLayout >= ROOM_LAYOUTS.length) {          // last option: a big scrolling arena
       room.layout = 0; room.cols = 36; room.rows = 24; room.layoutRows = RoomGen.arena(36, 24);
     }
+    if (this.testGrave) {                                  // panel: Graveyard (+ a Demonic Gargoyle statue)
+      room.section = 'graveyard'; Graveyard.layout(room, SECTION_TYPES.graveyard);
+      if (this.testGrave === 'statue') room.gargoyle = 'statue';
+    }
     this.map = { level: this.level, rooms: [room], byKey: { '0,0': room }, start: room, exit: room, gridSize: 1 };
     this.enterRoom(room, null);
   }
@@ -915,6 +922,7 @@ class GameScene extends Phaser.Scene {
     const theme = st.themes[Math.floor(Math.random() * st.themes.length)];
     this.map = LevelGenerator.generate(n, roomCount, lv.gridSize, { specials: true, theme: theme, merchant: this.merchantHere === 'sell' || this.merchantHere === 'deliver' });
     if (st.look && st.look.dark) NecroRooms.shape(this.map);        // halls, galleries, crypts
+    if (this.run) this.assignSections(this.map, st);                // graveyard rooms etc. (graveyard.js)
     if (this.merchantHere === 'deliver') {               // he waits for you: his room is on the map from the start
       const mr = this.map.rooms.find((r) => r.type === 'merchant');
       if (mr) mr.revealed = true;
@@ -947,6 +955,7 @@ class GameScene extends Phaser.Scene {
 
     this.room = room;
     room.visited = true;
+    this.sectionLook(room);                      // a section (graveyard) has its own look
     this.rooms.buildRoom(room);
     this.applyRoomSize();
 
@@ -972,6 +981,7 @@ class GameScene extends Phaser.Scene {
     }
 
     this.necroRoom(room);
+    this.graveRoom(room);
     this.hunterRoom();
     this.transitionLockMs = 250;
     this.hud.drawMinimap(this.map, room);
@@ -995,6 +1005,7 @@ class GameScene extends Phaser.Scene {
         this.enemies.queueSpawn(wave[i], this._pt.x + jx, this._pt.y + jy, cfg.spawnDelayMs + i * cfg.spawnStaggerMs);
       }
     }
+    this.graveFight(room);                       // graveyard rooms: gargoyles join
     room.fightStarted = true;
   }
 
@@ -1264,6 +1275,7 @@ class GameScene extends Phaser.Scene {
     this.updateCupid(dt);
     this.updateMiner(dt);
     this.updateExtras(dt);
+    this.updateGrave(dt);
     this.lighting.update(dt);
     this.hud.drawBoss(dt);
     this.hud.updatePanel(this.players, this.team, this.level, this.elapsedMs);
@@ -1404,6 +1416,7 @@ class GameScene extends Phaser.Scene {
     if (res === 'none' || res === 'parry') return;
     this.ribTrapCheck(p, res, attacker);              // Titan Ribcage armor
     this.thornsCheck(p, res, attacker);               // Thorn Armor
+    this.hexCheck(p, res, attacker);                  // gargoyles hex you
     if (res === 'dodge') this.hud.floatText(p.sprite.x, p.sprite.y - 26, 'Dodge', '#1565c0');
     // Amulet Robe: whoever hits you gets stunned, shorter for tanky enemies
     if (p.stats.stunOnHit > 0 && attacker && attacker.active && attacker.isEnemy) {
@@ -1489,6 +1502,8 @@ class GameScene extends Phaser.Scene {
     const bullet = a.isBullet ? a : b;
     if (!bullet.active) return;
     if (bullet.aoeRadius > 0) this.explode(bullet.x, bullet.y, bullet.aoeRadius, bullet.damage, bullet.owner);
+    const wall = a.isBullet ? b : a;
+    if (wall.tomb && bullet.manager === this.playerBullets) this.tombHit(wall, bullet.owner);   // graveyard tombstones break
     if (bullet.manager === this.playerBullets) {
       this.lighting.lightNear(bullet.x, bullet.y, 44);                         // shots light the torches they hit
       if (bullet.aoeRadius > 0 && (bullet.ignite || bullet.texture.key === 'fireball')) this.lighting.addFire(bullet.x, bullet.y, Math.max(40, bullet.aoeRadius * 0.6), 2600, bullet.owner);
@@ -1641,7 +1656,7 @@ class GameScene extends Phaser.Scene {
 
 /* ---------- Game Over ---------- */
 // merchant / treasure / shrine / themed rooms / arena / enemy bosses (specials.js)
-Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, ExtrasMixin);
+Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, ExtrasMixin, GraveMixin);
 
 class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOverScene'); }

@@ -222,6 +222,21 @@ Titan Ribcage (armor): +30 HP, 12% defense, 30% chance an enemy that hits you is
 - NEW Mine Train ★★★ MEGA (150; 100 mana, 26 s): tracks laid wall to wall in 0.9 s (axis closest to your aim, no diagonals),
   0.35 s rumble, train (loco + 3 ore cars) crosses at 1500 px/s: 170 + stun 0.9 s to everything in the lane (84 px wide),
   thrown sideways out of the lane.
+- Aura Dragon: speed 330 -> 540, turn 6 -> 11 (it catches fleeing enemies now).
+- Harp reworked: close-range strum (kind 'harp'): 34 dmg (was 24) to everything in a 150° arc, range 96, 0.68 s, 5 mana;
+  pink smear + white streaks + music notes.
+- Debug on phones: tap the main-menu title 5x and type "debug" (all menu codes work this way). Test Dungeon panel:
+  tap "hide", a TEST tab brings it back; taps on the panel don't aim/attack.
+- NEW SECTIONS (graveyard.js): a level can have a cluster of connected rooms with their own look and rules.
+  Necrotery GRAVEYARD (85% of Necrotery levels, 2-4 connected rooms, 20x13): outside, dark, heavy rain, lightning
+  flashes + thunder. Tombstones break in 3 hits (melee, shots, pickaxes): 50% 1-3 coins, 5% a weapon.
+  Each graveyard fight adds 1-2 Gargoyles.
+- NEW Gargoyle: 40 HP, fast, surges every 0.76 s (440 speed) while it keeps moving and turning; hits hex you.
+- NEW Hex on players: take 25% more damage (4-5 s). Purple mark over your head.
+- NEW mini-boss DEMONIC GARGOYLE (max 2 per Necrotery, 70% per graveyard section): a statue in the middle of a
+  graveyard room; get within 170 px -> lightning strikes it, room locks. 950 HP. Lightning storms (5 strikes, 7 when
+  furious, one after another, 20 dmg, no hex), dashes (2 in a row when furious), slashes (118 range, parryable),
+  summons 2 Gargoyles (max 4). Physical hits hex. Drops good loot + 24 coins + shavings like a mimic.
 - Pets, homing shots and auto-aim ignore bone piles (dark skeletons that will get back up).
 
 ## Future content plans

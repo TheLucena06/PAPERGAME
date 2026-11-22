@@ -50,7 +50,7 @@ Object.assign(ALLY_TYPES, {
   },
   auraDragon: {
     tex: 'dragon_head', tailTex: 'dragon_body', scale: 1.3,
-    hp: 9999, speed: 330, turn: 6, size: 30, segments: 3, spacing: 14,
+    hp: 9999, speed: 540, turn: 11, size: 30, segments: 3, spacing: 14,
     biteDamage: 30, biteCdMs: 300, biteKnockback: 220, ignite: { ms: 2000, tick: 3 },
     lifeMs: 5000, lifePerSub: { sub: 'Monk', ms: 1000 }, max: 1, seekRange: 900, invulnMs: 99999
   }

@@ -164,12 +164,19 @@ class TestPanel {
   toggle() {
     this.visible = !this.visible;
     this.root.setVisible(this.visible);
+    // a small tab to bring it back (phones have no T key)
+    if (!this.showBtn) {
+      const sc = this.scene, C = DEBUG_COLORS;
+      this.showRoot = sc.add.container(0, 0).setDepth(261).setScrollFactor(0);
+      this.showBtn = DebugUI.button(sc, this.showRoot, GAME_CONFIG.width - 66, 86, 'TEST', 12, () => this.toggle(), null, C.btn, 58).setScrollFactor(0);
+    }
+    this.showRoot.setVisible(!this.visible);
   }
 
   // Is the mouse over one of the panel's buttons (or the gear picker)? Then clicks don't attack.
   contains(ptr) {
     if (this.picker) return true;
-    if (!this.visible) return false;
+    if (!this.visible) return !!(this.showRoot && this.showBtn.getBounds().contains(ptr.x, ptr.y));
     const hits = this.scene.input.hitTestPointer(ptr);
     for (let i = 0; i < hits.length; i++) if (hits[i].parentContainer === this.root) return true;
     return false;
@@ -192,7 +199,7 @@ class TestPanel {
     // header + tabs
     const sec = STAGE_TYPES[sc.testStage || 'notebook'];
     this.T(x + 10, 8, 'TEST DUNGEON', 14, C.head);
-    this.T(x + w - 10, 10, '[T] hide', 11, C.quiet, false).setOrigin(1, 0);
+    this.B(x + w - 62, 6, 'hide [T]', () => this.toggle(), C.btn, 56, 11);
     this.T(x + 10, 28, sec.name + '  ·  Level ' + sc.level, 11, C.quiet, false);
     const tabs = [['spawn', 'Spawn'], ['gear', 'Gear'], ['room', 'Room']];
     for (let i = 0; i < tabs.length; i++) {
@@ -242,7 +249,7 @@ class TestPanel {
     y += 6;
     // bosses + mini-bosses
     y = this.head(y, 'Bosses');
-    const bosses = ['bookworm'].concat(Object.keys(ENEMY_TYPES).filter((k) => ENEMY_TYPES[k].boss));
+    const bosses = ['bookworm'].concat(Object.keys(ENEMY_TYPES).filter((k) => ENEMY_TYPES[k].boss && !ENEMY_TYPES[k].secret));
     col = 0;
     for (let i = 0; i < bosses.length; i++) {
       const id = bosses[i], name = id === 'bookworm' ? 'Bookworm' : ENEMY_TYPES[id].name.replace(/^The /, '');
@@ -306,6 +313,9 @@ class TestPanel {
     y += 22;
     B(x + 8, y, 'Dark: ' + (sc.testDark ? 'ON' : 'OFF'), () => { sc.testDark = !sc.testDark; sc.startTestRoom(); this.build(); }, sc.testDark ? '#4a148c' : C.off, 102, 11);
     B(x + 114, y, 'Survival arena', () => { this.clear(); sc.startArena(); }, '#37474f', 102, 11);
+    y += 22;
+    B(x + 8, y, 'Graveyard: ' + (sc.testGrave ? 'ON' : 'OFF'), () => { sc.testGrave = sc.testGrave ? false : true; this.clear(); sc.startTestRoom(); this.build(); }, sc.testGrave ? '#2e5d3a' : C.off, 102, 11);
+    B(x + 114, y, 'Gargoyle statue', () => { sc.testGrave = 'statue'; this.clear(); sc.startTestRoom(); this.build(); }, '#455a64', 102, 11);
     y += 28;
     y = this.head(y, 'Difficulty');
     B(x + 8, y, ' − ', () => this.setLevel(sc.level - 1), C.btn, 30, 12);

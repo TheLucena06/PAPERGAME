@@ -438,6 +438,7 @@ const RunRoomsMixin = {
 
   // An enemy died: was it part of the boss bar?
   afterEnemyKilled(e) {
+    if (this.afterGraveKill) this.afterGraveKill(e);
     if (e.typeId === 'mimic') {
       const p = this.players.find((q) => q.alive) || this.players[0];
       this.giveLoot(p, this.rollLoot(true), e.x, e.y);
