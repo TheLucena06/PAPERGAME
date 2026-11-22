@@ -1723,6 +1723,7 @@ if (typeof Phaser === 'undefined') {
     scene: [BootScene, MainMenuScene, PencilCaseScene, BestiaryScene, WeaponSelectScene, PadSetupScene, ControlsScene, TouchLayoutScene, GameScene, GameOverScene]
   });
   Magnifier.init(window.game);
+  TouchSync.init(window.game);
   MobileScreen.init();
   // phone version (served from a website): works offline after the first visit
   if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});

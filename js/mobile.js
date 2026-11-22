@@ -82,6 +82,7 @@ class TouchController {
     this.btnT = {};                   // pointer id -> button id
     this.lastTapEnd = -1e9;
     this.wasDown = {};                // pointer id -> was down last frame
+    this.wasIdent = {};               // pointer id -> which finger it was
     this.menuDown = null;             // { id, x, y, ms } for taps in menus
     this.pressed = {};                // button presses this frame
     this.g = scene.add.graphics().setDepth(260).setScrollFactor(0);
@@ -123,10 +124,13 @@ class TouchController {
       if (p === this.scene.input.mousePointer && !p.wasTouch) continue;
       const id = p.id, down = p.isDown, was = !!this.wasDown[id];
       seen[id] = true;
-      if (down && !was) this.onDown(p, playing, now);
+      // the same slot, but a different finger (the lift was missed): finish the old touch, start the new one
+      if (down && was && this.wasIdent[id] !== p.identifier) { this.onUp(p, playing, now); this.onDown(p, playing, now); }
+      else if (down && !was) this.onDown(p, playing, now);
       else if (down) this.onHold(p, playing);
       else if (!down && was) this.onUp(p, playing, now);
       this.wasDown[id] = down;
+      this.wasIdent[id] = p.identifier;
     }
     // a stick whose finger is gone (a lift the game missed: scene change, panel tap...) lets go by itself
     const held = (t) => { for (let i = 0; i < ps.length; i++) if (ps[i].id === t.id) return ps[i].isDown; return false; };
@@ -359,6 +363,43 @@ const Magnifier = {
 function touchHoldGuard(fn) {
   return function () { if (IS_TOUCH && Magnifier.used) { Magnifier.used = false; return; } return fn.apply(this, arguments); };
 }
+
+/* ---------------- touch bookkeeping (phones) ----------------
+   Some phone browsers report a lifted finger in a way Phaser doesn't match up,
+   so Phaser keeps that finger "down" forever. With 4 finger slots, a few of
+   those and new touches are ignored (sticks stuck, menus "stuck" on the last
+   thing you tapped). Every touch event lists exactly which fingers are on the
+   screen right now: any finger slot not in that list is freed here. */
+const TouchSync = {
+  init(game) {
+    if (!IS_TOUCH) return;
+    this.game = game;
+    // before Phaser sees a new touch: free leaked slots + re-measure the canvas (the browser bar may have moved it)
+    window.addEventListener('touchstart', (e) => {
+      try { if (game.scale) game.scale.updateBounds(); } catch (err) { /* (not ready) */ }
+      this.free(e.touches);
+    }, { capture: true, passive: true });
+    // after Phaser handled a lift: anything still "down" that isn't on the screen is let go
+    const after = (e) => { const live = e.touches; setTimeout(() => this.free(live), 0); };
+    window.addEventListener('touchend', after, { passive: true });
+    window.addEventListener('touchcancel', after, { passive: true });
+    // no fingers at all (e.g. after an app switch): everything up
+    window.addEventListener('blur', () => this.free([]));
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.free([]); });
+  },
+  free(touches) {
+    const im = this.game && this.game.input;
+    if (!im || !im.pointers) return;
+    const live = {};
+    for (let i = 0; i < touches.length; i++) live[touches[i].identifier] = true;
+    for (let i = 1; i < im.pointers.length; i++) {
+      const p = im.pointers[i];
+      if (!p.active && !p.isDown) continue;
+      if (live[p.identifier]) continue;
+      p.isDown = false; p.primaryDown = false; p.buttons = 0; p.active = false; p.wasTouch = true;
+    }
+  }
+};
 
 /* ---------------- full screen + landscape (phones) ---------------- */
 const MobileScreen = {
