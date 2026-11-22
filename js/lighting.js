@@ -213,7 +213,7 @@ class Lighting {
     };
     for (let i = 0; i < sc.players.length; i++) {
       const p = sc.players[i];
-      if (p.alive || p.downed) L(p.sprite.x, p.sprite.y, S.player);
+      if (p.alive || p.downed) L(p.sprite.x, p.sprite.y, S.player * (1 + ((p.stats && p.stats.lightBonus) || 0)));   // Gargoyle Eye: see far
     }
     let list = sc.playerBullets.group.getChildren();
     for (let i = 0; i < list.length; i++) {

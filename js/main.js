@@ -531,7 +531,7 @@ class GameScene extends Phaser.Scene {
     this.events.once('shutdown', this.cleanup, this);
     const dbg = cfg.debug;
     if (this.testMode) { this.startTestDungeon(); return; }
-    this.extrasRunStart();
+    this.russiRunStart();                        // secret (russi.js): before the first room spawns
     this.startRun(dbg.startLevel, dbg);
   }
 
@@ -1069,7 +1069,7 @@ class GameScene extends Phaser.Scene {
   // Worm bosses live in BOSS_TYPES (BossManager); the others are big enemies
   // with ai of their own (ENEMY_TYPES with boss: {...}).
   startBoss(bossId) {
-    bossId = this.extrasBossId(bossId || (this.run ? this.stage().boss : 'bookworm'));
+    bossId = this.russiBossId(bossId || (this.run ? this.stage().boss : 'bookworm'));
     this.currentBossId = bossId;
     this.level = Math.max(1, this.run ? this.run.levelNum : this.level);
     this.enemies.setLevel(this.level, GAME_CONFIG.levels);
@@ -1274,7 +1274,7 @@ class GameScene extends Phaser.Scene {
     this.updateBerserker(dt);
     this.updateCupid(dt);
     this.updateMiner(dt);
-    this.updateExtras(dt);
+    this.updateRussi(dt);
     this.updateGrave(dt);
     this.lighting.update(dt);
     this.hud.drawBoss(dt);
@@ -1656,7 +1656,7 @@ class GameScene extends Phaser.Scene {
 
 /* ---------- Game Over ---------- */
 // merchant / treasure / shrine / themed rooms / arena / enemy bosses (specials.js)
-Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, ExtrasMixin, GraveMixin);
+Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, RussiMixin, GraveMixin);
 
 class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOverScene'); }

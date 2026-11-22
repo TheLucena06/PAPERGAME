@@ -20,7 +20,7 @@ const SECTION_TYPES = {
     name: 'Graveyard', stageStyle: 'necro', rooms: [2, 4], chance: 0.85, cols: 20, rows: 13,
     look: { style: 'graveyard', dark: true, bg: 0x18211b, line: 0x2a3a2e, wall: 0x46554b, block: 0xffffff, door: 0x5d4037 },
     gargoyles: { max: 2, chance: 0.7 },                // Demonic Gargoyle statues per Necrotery (whole stage)
-    roomGargoyles: [1, 2]                              // small gargoyles joining each graveyard fight
+    roomGargoyles: [2, 3]                              // gargoyles are the graveyard's common enemy (every graveyard fight)
   }
 };
 
@@ -164,6 +164,61 @@ Object.assign(ENEMY_AI, {
     m.setState(e, 'move', 0);
   }
 });
+
+/* ---------------- Demonic Gargoyle loot ---------------- */
+// The Gargoyle Eye: only the Demonic Gargoyle drops it.
+Object.assign(EFFECT_TYPES, { gargoyleEye: { name: 'Gargoyle Eye', durationMs: 90000, mods: { lightBonus: 1.6 } } });
+Object.assign(STAT_DEFAULTS, { lightBonus: 0 });
+CONSUMABLE_TYPES.gargoyleEye = EFFECT_ITEM('Gargoyle Eye', 'EYE', 30, null, null, 'gargoyleEye',
+  '90 s: you see far in the dark\n(your light is 2.6x bigger).', { bossItem: 'demonGargoyle' });
+
+// Blueprints it can drop (60%): then they are in the shops in every future run.
+WEAPON_TYPES.gargoyleClaw = {
+  name: 'Gargoyle Claw', short: 'CLAW', kind: 'melee', class: 'melee', sub: 'Knight', type: 'sword', price: 95, postBoss: POST_BOSS_1, blueprint: 'gargoyleClaw',
+  desc: 'A stone claw blade: quick, short\nslashes (24) that HEX every enemy they\nhit (hexed enemies take +25% damage).',
+  damage: 24, range: 70, arcDeg: 110, cooldownMs: 340, knockback: 200, knockbackMs: 90, swingFxMs: 120,
+  hex: { ms: 3000 },
+  visual: { style: 'blade', length: 24, width: 6, color: 0x78909c, guard: 0x37474f, swing: 0xb388ff }
+};
+SKILL_TYPES.hexLightning = {
+  name: 'Hex Lightning', short: 'HEXL', kind: 'hexLightning', class: 'arcane', sub: 'Witch', price: 140, postBoss: POST_BOSS_2, blueprint: 'hexLightning',
+  desc: 'Call hexed lightning where you aim (50,\nhexes). From every enemy it hits, it\njumps to enemies standing close by for\na little less damage, and on (each\nenemy is hit only once).',
+  manaCost: 35, cooldownMs: 7000, range: 420, radius: 60, damage: 50,
+  jumpRange: 95, jumpMul: 0.8, maxHits: 14, minDamage: 8, hex: { ms: 4000 }
+};
+SKILL_BEHAVIORS.hexLightning = function (p, d, ctx) {
+  const sc = ctx.scene, pt = SkillAim.point(p, ctx, d.range), list = ctx.enemies.targets();
+  const hit = [], queue = [];
+  sc.bolts.push({ x: pt.x, y: pt.y, at: sc.time.now, warn: 1, r: 0, dmg: 0, hit: true, fade: 260, seed: Math.random() * 100 });
+  sc.cameras.main.shake(90, 0.004);
+  if (sc.lighting) sc.lighting.lightNear(pt.x, pt.y, d.radius + 30);
+  const strike = (e, dmg, from) => {
+    hit.push(e);
+    ctx.hitEnemy(e, Math.round(dmg), 0, 0, 0, 0, p, 'aoe');
+    if (e.active) GearFx.hex(ctx.enemies, e, d.hex, p);
+    if (from) sc.arcs.push({ x1: from.x, y1: from.y, x2: e.x, y2: e.y, fade: 280, seed: Math.random() * 10 });
+    queue.push({ e: e, x: e.x, y: e.y, dmg: dmg });
+  };
+  const base = d.damage * p.stats.damageMul;
+  for (let i = 0; i < list.length && hit.length < d.maxHits; i++) {        // the strike itself
+    const e = list[i];
+    if (!e.active || e.state === 'bones' || e.state === 'dust') continue;
+    const dx = e.x - pt.x, dy = e.y - pt.y, r = d.radius + e.def.size / 2;
+    if (dx * dx + dy * dy <= r * r) strike(e, base, null);
+  }
+  // the chain: every struck enemy passes it on to close enemies that weren't hit yet (each enemy once, capped)
+  for (let q = 0; q < queue.length && hit.length < d.maxHits; q++) {
+    const src = queue[q], next = src.dmg * d.jumpMul;
+    if (next < d.minDamage) continue;
+    for (let i = 0; i < list.length && hit.length < d.maxHits; i++) {
+      const e = list[i];
+      if (!e.active || hit.indexOf(e) !== -1 || e.state === 'bones' || e.state === 'dust') continue;
+      const dx = e.x - src.x, dy = e.y - src.y;
+      if (dx * dx + dy * dy <= d.jumpRange * d.jumpRange) strike(e, next, src);
+    }
+  }
+  return true;
+};
 
 /* ---------------- textures ---------------- */
 const GraveTextures = {
@@ -318,6 +373,7 @@ const GraveMixin = {
     this.graveG = this.add.graphics().setDepth(84);                     // bolts, warnings, eyes, hex marks
     this.rainG = this.add.graphics().setDepth(86).setScrollFactor(0);   // rain over everything
     this.bolts = [];
+    this.arcs = [];                                                     // Hex Lightning jumps
     this.rain = [];
     for (let i = 0; i < GRAVE_RULES.rainDrops; i++) this.rain.push({ x: Math.random() * GAME_CONFIG.width, y: Math.random() * GAME_CONFIG.height, s: 0.7 + Math.random() * 0.6 });
     this.thunderMs = 3000;
@@ -338,7 +394,7 @@ const GraveMixin = {
 
   // after the room is built
   graveRoom(room) {
-    this.bolts.length = 0;
+    this.bolts.length = 0; this.arcs.length = 0;
     if (this.statue) { this.statue.destroy(); this.statue = null; }
     this.tombsInRoom = false;
     if (!room || room.section !== 'graveyard') return;
@@ -470,6 +526,9 @@ const GraveMixin = {
     this.giveLoot(p, this.rollLoot(true), e.x, e.y);
     this.coins.drop(e.x, e.y, Math.round(24 * this.coinMul()), this.team);
     if (typeof SHAVINGS_EARN !== 'undefined') this.earnShavings(SHAVINGS_EARN.mimic, e.x, e.y);
+    ShopLogic.give(this.team, p, 'consumable', 'gargoyleEye');                 // always: its eye
+    this.hud.floatText(e.x, e.y - 70, 'Gargoyle Eye!', '#ff1744');
+    this.dropBlueprint('gargoyle', e.x, e.y);                                   // 60%: Gargoyle Claw / Hex Lightning
     if (this.room && this.room.gargoyle) this.room.gargoyle = 'dead';
     const list = this.enemies.group.getChildren();
     for (let i = 0; i < list.length; i++) if (list[i].active && list[i].summonedBy === e) this.enemies.kill(list[i]);
@@ -533,6 +592,17 @@ const GraveMixin = {
       this.drawBolt(g, b.x, b.y, b.seed, a, top);
       if (b.big) this.drawBolt(g, b.x + 6, b.y, b.seed + 2, a, top);
       if (this.lighting && this.lighting.active) this.lighting.add(b.x, b.y, (b.big ? 260 : 150) * a);
+    }
+    // Hex Lightning jumping between enemies
+    for (let i = this.arcs.length - 1; i >= 0; i--) {
+      const a = this.arcs[i];
+      a.fade -= dt;
+      if (a.fade <= 0) { this.arcs.splice(i, 1); continue; }
+      const k = a.fade / 280, pts = [];
+      for (let s = 0; s <= 6; s++) { const t = s / 6, j = (s === 0 || s === 6) ? 0 : Math.sin(a.seed + s * 2.3) * 10; pts.push({ x: a.x1 + (a.x2 - a.x1) * t - (a.y2 - a.y1) / 200 * j, y: a.y1 + (a.y2 - a.y1) * t + (a.x2 - a.x1) / 200 * j }); }
+      g.lineStyle(7, 0x7c4dff, 0.35 * k); g.strokePoints(pts, false);
+      g.lineStyle(2.5, 0xe1d5ff, 0.95 * k); g.strokePoints(pts, false);
+      if (this.lighting && this.lighting.active) this.lighting.add(a.x2, a.y2, 60 * k);
     }
     if (!room || room.section !== 'graveyard') return;
     // the statue wakes up when someone walks close

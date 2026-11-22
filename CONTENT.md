@@ -222,6 +222,9 @@ Titan Ribcage (armor): +30 HP, 12% defense, 30% chance an enemy that hits you is
 - NEW Mine Train ★★★ MEGA (150; 100 mana, 26 s): tracks laid wall to wall in 0.9 s (axis closest to your aim, no diagonals),
   0.35 s rumble, train (loco + 3 ore cars) crosses at 1500 px/s: 170 + stun 0.9 s to everything in the lane (84 px wide),
   thrown sideways out of the lane.
+- SECRET (see NOTES.md): code "russi" -> Cupid kit + BIG RUSSI replaces the Bookworm next run (1900 HP, 15x10 arena,
+  teeth spirals, laughing rings, hair curtains with a gap, double headbutts, mini heads, cross, phase-3 flower),
+  then a run where every normal enemy has his face. Drops the Bookworm's loot.
 - Aura Dragon: speed 330 -> 540, turn 6 -> 11 (it catches fleeing enemies now).
 - Harp reworked: close-range strum (kind 'harp'): 34 dmg (was 24) to everything in a 150° arc, range 96, 0.68 s, 5 mana;
   pink smear + white streaks + music notes.
@@ -232,6 +235,12 @@ Titan Ribcage (armor): +30 HP, 12% defense, 30% chance an enemy that hits you is
   flashes + thunder. Tombstones break in 3 hits (melee, shots, pickaxes): 50% 1-3 coins, 5% a weapon.
   Each graveyard fight adds 1-2 Gargoyles.
 - NEW Gargoyle: 40 HP, fast, surges every 0.76 s (440 speed) while it keeps moving and turning; hits hex you.
+- Gargoyles are the graveyard's common enemy: 2-3 join EVERY graveyard fight (statue or not).
+- Demonic Gargoyle loot: like a Mimic (good item, coins, shavings) + always the GARGOYLE EYE (exclusive consumable:
+  90 s, your light is 2.6x bigger in the dark) + 60% a blueprint:
+  - Gargoyle Claw ★★ (Melee · Knight, 95): short quick slashes 24, range 70, 0.34 s, every hit hexes 3 s.
+  - Hex Lightning ★★★ (Arcane · Witch, 140; 35 mana, 7 s): strike where you aim (50, radius 60, hexes 4 s); from each
+    enemy hit it jumps to enemies within 95 px for 80% (each enemy once, max 14 hits, stops below 8 damage).
 - NEW Hex on players: take 25% more damage (4-5 s). Purple mark over your head.
 - NEW mini-boss DEMONIC GARGOYLE (max 2 per Necrotery, 70% per graveyard section): a statue in the middle of a
   graveyard room; get within 170 px -> lightning strikes it, room locks. 950 HP. Lightning storms (5 strikes, 7 when

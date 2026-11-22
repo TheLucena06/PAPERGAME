@@ -143,12 +143,20 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 - js/miner.js: POST_BOSS_3 (★★★★), CoalFx (e.coalUntil; ProjectileManager.fire wrapper jitters enemy shots; GearFx.ignite
   wrapper doubles burn; applyAll wrapper doubles fire hits), FireSpread, Mine Train (MinerManager scene.miner, lane coords
   u/v so everything is axis-aligned), MINER_RARE (ShopLogic.tierWeight wrapper; generate(..., players); rollLoot filter).
+- SECRET (js/russi_art.js + js/russi.js, don't advertise): typing "russi" on the main menu (phones: tap the title 5x,
+  then type it) sets SaveData.data.secret.russiBoss + unlocks the secret Cupid kit (Harp, no armor yet).
+  Next run: GameScene.russiBossId swaps the Bookworm for ENEMY_TYPES.russiHead (bullet-hell boss, RussiBoss patterns,
+  3 phases, drops the Bookworm's loot via def.lootAs). Starting that fight sets secret.russiFaces: the run after,
+  scene.facesRun swaps normal enemies' textures for same-size canvas textures of the face (flinch face when hurt).
+  Photos are WebP data URIs drawn into canvas textures (RussiArt). Enemy bullet pool raised to 260.
+  balance_data.py skips ENEMY_TYPES with secret: true.
 - SECTIONS (js/graveyard.js): SECTION_TYPES {stageStyle, rooms, look, ...}; Graveyard.assign(map) runs in startLevel
   (runs only), marks room.section + its own layout; GameScene.sectionLook(room) swaps rooms.look before buildRoom
   (baseLook keeps the stage look). graveRoom() turns blocks into tombs (b.tomb, b.tombHp); tombs break via tombHit
   (bullets in onBulletHitsWall, melee via a WeaponSystem.meleeArc wrapper, pickaxes via a breakBlockAt wrapper).
   Statue: room.gargoyle 'statue' -> 'awake' -> 'dead'; scene.run.gargoyles counts statues per run (max 2).
   Player hex: p.hexMs (Player.takeHit wrapper x1.25), set in hexCheck from attacker.def.hexOnHit.
+- MENU_CODES (menus.js): typed codes on the main menu / start select; phones tap the title 5x. russi.js adds 'russi'.
 - VISION.md = the owner's original brief, word for word, plus a built / not-built checklist. Keep the checklist updated.
 - Shields: def.slam (release after chargeMs = 360° meleeArc), def.bash (dash-attack meleeArc), def.raisedSpeedMul (player.js movement).
 - Boulder (js/boulder.js, loaded after hunter.js): weapon kind 'boulder' (WEAPON_BEHAVIORS.boulder wraps melee), BoulderManager (scene.boulders, ctx.boulders), BoulderMixin setupBoulder/updateBoulder/boulderRoom. w.thrown = weight-off mode: Stats.build adds def.weightOff; HUD draws punchVisual.

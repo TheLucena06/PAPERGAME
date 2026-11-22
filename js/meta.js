@@ -69,10 +69,12 @@ const BLUEPRINT_TYPES = {
   recurveBow:   { name: 'Recurve Bow',   from: ['champion', 'mimic', 'boss'] },
   boomerang:    { name: 'Boomerang',     from: ['champion', 'mimic', 'boss'] },
   ironKnuckles: { name: 'Iron Knuckles', from: ['champion', 'mimic', 'boss'] },
-  gnome:        { name: 'Gnome Gear',    from: ['gnome'] }
+  gnome:        { name: 'Gnome Gear',    from: ['gnome'] },
+  gargoyleClaw: { name: 'Gargoyle Claw', from: ['gargoyle'] },
+  hexLightning: { name: 'Hex Lightning', from: ['gargoyle'] }
 };
 
-const BLUEPRINT_DROP = { champion: 0.35, mimic: 0.5, boss: 1, gnome: 0.07 };
+const BLUEPRINT_DROP = { champion: 0.35, mimic: 0.5, boss: 1, gnome: 0.07, gargoyle: 0.6 };
 
 const Meta = {
   data() {

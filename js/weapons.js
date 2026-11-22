@@ -781,6 +781,7 @@ const WeaponSystem = {
       ctx.hitEnemy(e, Math.round(dmg), dx / len, dy / len, h.knockback, h.knockbackMs, p);
       if (h.stunMs && e.active && ctx.stunEnemy) ctx.stunEnemy(e, h.stunMs);
       if (h.slowHit && e.active) ctx.enemies.slow(e, h.slowHit.ms, h.slowHit.pct);   // Boulder: every hit slows
+      if (h.hex && e.active) GearFx.hex(ctx.enemies, e, h.hex, p);                  // Gargoyle Claw: every hit hexes
       if (h.wallStun && e.active && ctx.enemies.wallStun) ctx.enemies.wallStun(e, (h.knockbackMs || 140) + 60, h.wallStun);   // knocked into a wall = stunned
       // Hunter Knife: chance to Injure (bleed + slow)
       if (h.injure && e.active && !e.isBossPart && Math.random() < h.injure.chance) {
