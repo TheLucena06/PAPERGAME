@@ -245,6 +245,9 @@ Titan Ribcage (armor): +30 HP, 12% defense, 30% chance an enemy that hits you is
   a quick tap on the attack side = one attack at the nearest enemy; the Test Dungeon panel starts hidden (tap TEST).
 - Phones (2): fingers the browser "lost" are freed on every touch event (TouchSync), and a reused finger slot counts as a
   new touch - fixes sticks stuck in place and taps/menus stuck on the previous touch.
+- MELEE HIT FIX: (1) a swing stays live while its slash is on screen (up to 0.26 s): enemies that move into it, or
+  that you move onto, still get hit (once per swing); before, only the first frame counted. (2) the arc counts the
+  enemy's body, not only its center, so big enemies at the edge of a slash get hit.
 - NEW Hex on players: take 25% more damage (4-5 s). Purple mark over your head.
 - NEW mini-boss DEMONIC GARGOYLE (max 2 per Necrotery, 70% per graveyard section): a statue in the middle of a
   graveyard room; get within 170 px -> lightning strikes it, room locks. 950 HP. Lightning storms (5 strikes, 7 when

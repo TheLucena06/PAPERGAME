@@ -682,8 +682,25 @@ const WeaponSystem = {
     const w = p.weapon;
     if (!w) return;
     if (w.swingFxMs > 0) w.swingFxMs -= dt;
+    if (w.swingLive) this.swingTick(p, w, dt, ctx);
     const fn = WEAPON_BEHAVIORS[w.def.kind];
     if (fn) fn(p, w, dt, ctx);
+  },
+
+  // A live swing (see meleeArc): hit enemies that came into the arc after the first frame.
+  swingTick(p, w, dt, ctx) {
+    const L = w.swingLive;
+    if (ctx.scene.time.now > L.until || !p.alive) { w.swingLive = null; return; }   // real time: an old swing never comes back after a weapon swap
+    if (L.max && L.hit.length >= L.max) return;
+    const px = p.sprite.x, py = p.sprite.y, ax = Math.cos(L.ang), ay = Math.sin(L.ang), list = ctx.enemies.targets();
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      if (!e.active || L.hit.indexOf(e) !== -1) continue;
+      if (!this.inArc(px, py, ax, ay, e.x, e.y, L.range + e.def.size / 2, L.cosHalf, p.stats.size, e.def.size / 2)) continue;
+      L.hit.push(e);
+      L.hitOne(e, px, py);
+      if (L.max && L.hit.length >= L.max) break;
+    }
   },
 
   // Precision shots: arrows/bolts. Handles multi-shot (Extra Loaded) and
@@ -723,12 +740,18 @@ const WeaponSystem = {
     );
   },
 
-  inArc(px, py, ax, ay, x, y, reach, cosHalf, innerRadius) {
+  // radius (optional) = the target's size / 2: a body that pokes into the arc counts, not just its center
+  inArc(px, py, ax, ay, x, y, reach, cosHalf, innerRadius, radius) {
     const dx = x - px, dy = y - py;
     const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
     if (dist > reach) return false;
-    if (dist < innerRadius) return true;
-    return (dx * ax + dy * ay) / dist >= cosHalf;
+    if (dist < innerRadius + (radius || 0)) return true;
+    const c = (dx * ax + dy * ay) / dist;
+    if (c >= cosHalf) return true;
+    if (!radius) return false;
+    // widen the half-angle by the angle the body covers at this distance
+    const half = Math.acos(Math.max(-1, Math.min(1, cosHalf))), extra = Math.asin(Math.min(1, radius / dist));
+    return Math.acos(Math.max(-1, Math.min(1, c))) <= half + extra;
   },
 
   // Hits enemies in the arc in front of the player.
@@ -748,7 +771,7 @@ const WeaponSystem = {
     for (let i = 0; i < list.length; i++) {
       const e = list[i];
       if (!e.active) continue;
-      if (this.inArc(px, py, ax, ay, e.x, e.y, h.range + e.def.size / 2, cosHalf, inner)) t.push(e);
+      if (this.inArc(px, py, ax, ay, e.x, e.y, h.range + e.def.size / 2, cosHalf, inner, e.def.size / 2)) t.push(e);
     }
     const max = h.maxTargets || (h === wd ? wd.maxTargets : 0) || 0;
     if (max && t.length > max) {
@@ -769,14 +792,13 @@ const WeaponSystem = {
     if (wd && wd.rage) base *= 1 + wd.rage * (1 - p.hp / p.stats.maxHp);   // Berserker: stronger the more hurt you are
     // melee vs bosses: every melee weapon hits bosses harder (+25%), swords more (bossMul)
     const bossMul = wd ? (wd.bossMul || (wd.class === 'melee' ? 1.25 : 1)) : 1;
-    for (let i = 0; i < t.length; i++) {
-      const e = t[i];
+    const hitOne = (e, fromX, fromY) => {
       let dmg = base;
       if (parry && (e.state === 'dash' || e.dashGraceMs > 0)) dmg *= (h.parryDamageMul || 2);
       if (wd && wd.execute && e.maxHp > 0 && e.hp / e.maxHp < wd.execute.below) dmg *= (e.isBossPart || (e.def && (e.def.boss || e.def.bossPart)) || e.champion) ? wd.execute.bossMul : wd.execute.mul;
       if (wd && wd.bleedBonus && e.bleedMs > 0) dmg *= 1 + wd.bleedBonus;
       if (bossMul !== 1 && GearFx.isBoss(e)) dmg *= bossMul;
-      const dx = e.x - px, dy = e.y - py;
+      const dx = e.x - fromX, dy = e.y - fromY;
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
       ctx.hitEnemy(e, Math.round(dmg), dx / len, dy / len, h.knockback, h.knockbackMs, p);
       if (h.stunMs && e.active && ctx.stunEnemy) ctx.stunEnemy(e, h.stunMs);
@@ -789,6 +811,14 @@ const WeaponSystem = {
         ctx.enemies.bleed(e, inj.bleedMs, Math.max(1, Math.round(inj.bleedTick * p.stats.damageMul)), p);
         ctx.enemies.slow(e, inj.slowMs, inj.slowPct);
       }
+    };
+    for (let i = 0; i < t.length; i++) hitOne(t[i], px, py);
+
+    // The swing stays "live" while you can see it: enemies that walk into it (or that you walk onto) still get hit,
+    // once per swing. (Before, only the very first frame counted, so an enemy inside the slash could be missed.)
+    if (w && !parry) {
+      const vis = h.swingFxMs || (wd && wd.swingFxMs) || 120;
+      w.swingLive = { until: ctx.scene.time.now + Math.min(260, vis), ang: Math.atan2(ay, ax), cosHalf: cosHalf, range: h.range, hit: t.slice(), max: max, hitOne: hitOne };
     }
 
     if (!parry) return;

@@ -157,6 +157,9 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
   Statue: room.gargoyle 'statue' -> 'awake' -> 'dead'; scene.run.gargoyles counts statues per run (max 2).
   Player hex: p.hexMs (Player.takeHit wrapper x1.25), set in hexCheck from attacker.def.hexOnHit.
 - MENU_CODES (menus.js): typed codes on the main menu / start select; phones tap the title 5x. russi.js adds 'russi'.
+- Melee: WeaponSystem.meleeArc stores w.swingLive {until, ang, hitOne...}; WeaponSystem.swingTick (called from update)
+  hits enemies entering the arc until it ends. inArc(..., radius) widens the angle by the target's body.
+- Touch: TouchSync (mobile.js) frees Phaser pointers the browser lost; TouchController.wasIdent spots a reused slot.
 - VISION.md = the owner's original brief, word for word, plus a built / not-built checklist. Keep the checklist updated.
 - Shields: def.slam (release after chargeMs = 360° meleeArc), def.bash (dash-attack meleeArc), def.raisedSpeedMul (player.js movement).
 - Boulder (js/boulder.js, loaded after hunter.js): weapon kind 'boulder' (WEAPON_BEHAVIORS.boulder wraps melee), BoulderManager (scene.boulders, ctx.boulders), BoulderMixin setupBoulder/updateBoulder/boulderRoom. w.thrown = weight-off mode: Stats.build adds def.weightOff; HUD draws punchVisual.
