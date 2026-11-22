@@ -159,6 +159,7 @@ class TestPanel {
     this.picker = null;
     this.build();
     scene.input.keyboard.on('keydown-T', () => this.toggle());
+    if (typeof IS_TOUCH !== 'undefined' && IS_TOUCH) this.toggle();   // phones: start hidden (tap TEST), so it doesn't cover the aim side
   }
 
   toggle() {

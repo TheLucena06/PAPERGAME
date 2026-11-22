@@ -241,6 +241,8 @@ Titan Ribcage (armor): +30 HP, 12% defense, 30% chance an enemy that hits you is
   - Gargoyle Claw ★★ (Melee · Knight, 95): short quick slashes 24, range 70, 0.34 s, every hit hexes 3 s.
   - Hex Lightning ★★★ (Arcane · Witch, 140; 35 mana, 7 s): strike where you aim (50, radius 60, hexes 4 s); from each
     enemy hit it jumps to enemies within 95 px for 80% (each enemy once, max 14 hits, stops below 8 damage).
+- Phones: a stick whose finger is gone lets go by itself (the attack stick could get stuck and block attacking);
+  a quick tap on the attack side = one attack at the nearest enemy; the Test Dungeon panel starts hidden (tap TEST).
 - NEW Hex on players: take 25% more damage (4-5 s). Purple mark over your head.
 - NEW mini-boss DEMONIC GARGOYLE (max 2 per Necrotery, 70% per graveyard section): a statue in the middle of a
   graveyard room; get within 170 px -> lightning strikes it, room locks. 950 HP. Lightning storms (5 strikes, 7 when

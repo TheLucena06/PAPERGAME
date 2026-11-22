@@ -128,6 +128,10 @@ class TouchController {
       else if (!down && was) this.onUp(p, playing, now);
       this.wasDown[id] = down;
     }
+    // a stick whose finger is gone (a lift the game missed: scene change, panel tap...) lets go by itself
+    const held = (t) => { for (let i = 0; i < ps.length; i++) if (ps[i].id === t.id) return ps[i].isDown; return false; };
+    if (this.moveT && !held(this.moveT)) this.moveT = null;
+    if (this.aimT && !held(this.aimT)) this.aimT = null;
     // sticks
     if (this.moveT) {
       const dx = this.moveT.x - this.moveT.bx, dy = this.moveT.y - this.moveT.by, len = Math.sqrt(dx * dx + dy * dy), r = this.L.moveStick.r;
@@ -139,6 +143,12 @@ class TouchController {
       const dx = this.aimT.x - this.aimT.bx, dy = this.aimT.y - this.aimT.by, len = Math.sqrt(dx * dx + dy * dy);
       if (len > 16) { this.aimT.dragged = true; this._aim.x = dx / len; this._aim.y = dy / len; }
       atk = this.aimT.dragged;
+    }
+    // a quick tap on the attack side = one attack at the nearest enemy (Brawl Stars style)
+    if (this.tapShotMs > 0 && playing) {
+      this.tapShotMs -= sc.game.loop.delta;
+      atk = true;
+      if (!this.aimT) this.aimAtNearest();
     }
     s.attackPressed = atk && !s.attackHeld;
     s.attackHeld = playing && atk;
@@ -167,8 +177,9 @@ class TouchController {
       if (!this.moveT) this.moveT = { id: p.id, bx: p.x, by: p.y, x: p.x, y: p.y };
     } else if (!this.aimT) {
       // double-tap on the aim side = swap weapon
-      if (now - this.lastTapEnd < 420) { this.state.swap = true; this.lastTapEnd = -1e9; }
-      this.aimT = { id: p.id, bx: p.x, by: p.y, x: p.x, y: p.y, startMs: now, dragged: false };
+      let swapTap = false;
+      if (now - this.lastTapEnd < 420) { this.state.swap = true; this.lastTapEnd = -1e9; swapTap = true; }
+      this.aimT = { id: p.id, bx: p.x, by: p.y, x: p.x, y: p.y, startMs: now, dragged: false, swapTap: swapTap };
     }
   }
 
@@ -189,7 +200,10 @@ class TouchController {
     if (this.btnT[p.id]) { delete this.btnT[p.id]; return; }
     if (this.moveT && this.moveT.id === p.id) { this.moveT = null; return; }
     if (this.aimT && this.aimT.id === p.id) {
-      if (!this.aimT.dragged && now - this.aimT.startMs < 350) this.lastTapEnd = now;   // a tap (for double-tap)
+      if (!this.aimT.dragged && now - this.aimT.startMs < 350) {   // a tap: attack once (and remember it, for double-tap = swap)
+        this.lastTapEnd = now;
+        if (playing && !this.aimT.swapTap) { this.tapShotMs = 130; this.aimAtNearest(); }   // (not the tap that swapped)
+      }
       this.aimT = null;
       return;
     }
@@ -200,6 +214,22 @@ class TouchController {
       const dx = p.x - md.x, dy = p.y - md.y;
       if (dx * dx + dy * dy < 30 * 30) { this.menu.click = true; this.menu.px = p.x; this.menu.py = p.y; }
     }
+  }
+
+  aimAtNearest() {
+    const sc = this.scene, pl = sc.players && sc.players.find((q) => q.controller === this);
+    if (!pl || !sc.enemies) return;
+    const list = sc.enemies.targets();
+    let best = null, bd = 1e12;
+    for (let i = 0; i < list.length; i++) {
+      const e = list[i];
+      if (!e.active || e.state === 'bones' || e.state === 'dust' || (e.isBossPart && !e.surfaced)) continue;
+      const dx = e.x - pl.sprite.x, dy = e.y - pl.sprite.y, d = dx * dx + dy * dy;
+      if (d < bd) { bd = d; best = e; }
+    }
+    if (!best) return;                                   // nobody around: keep the last aim
+    const dx = best.x - pl.sprite.x, dy = best.y - pl.sprite.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    this._aim.x = dx / len; this._aim.y = dy / len;
   }
 
   getMoveDirection() { return this._move; }
