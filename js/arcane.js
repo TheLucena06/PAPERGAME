@@ -180,7 +180,7 @@ Object.assign(WEAPON_TYPES, {
     visual: { style: 'blade', length: 32, width: 5, color: 0x90caf9, guard: 0xffd54f, swing: 0xfff59d, glow: 0xfff176 }
   },
   craneBlade: {
-    name: 'Paper Crane Blade', short: 'CRNE', kind: 'melee', class: 'melee', sub: 'Knight', type: 'sword', price: 85, postBoss: POST_BOSS_1,
+    name: 'Paper Crane Blade', short: 'CRNE', kind: 'melee', class: 'melee', sub: 'Knight', type: 'sword', price: 85, postBoss: POST_BOSS_1, blueprint: 'craneBlade',
     desc: 'Folded steel (34). Every 2nd swing sends\n2 homing paper cranes (18 each).',
     damage: 34, range: 90, arcDeg: 130, cooldownMs: 400, knockback: 200, knockbackMs: 100, swingFxMs: 120,
     dashParry: true, parryDamageMul: 2, reflectDamageMul: 1.5, reflectSpeed: 640, bossMul: 1.4,
@@ -189,6 +189,7 @@ Object.assign(WEAPON_TYPES, {
   },
   verdantBlade: {
     name: 'Verdant Blade', short: 'VERD', kind: 'melee', class: 'melee', sub: 'Knight', type: 'sword', price: 145, postBoss: POST_BOSS_2,
+    debugOnly: true,   // owner's call: Test Dungeon only
     desc: 'Big slashes (54). EVERY swing fires a green\nbeam (40) that cuts through 4 enemies.',
     damage: 54, range: 100, arcDeg: 140, cooldownMs: 430, knockback: 280, knockbackMs: 120, swingFxMs: 140,
     dashParry: true, parryDamageMul: 2, reflectDamageMul: 1.6, reflectSpeed: 680, bossMul: 1.5,

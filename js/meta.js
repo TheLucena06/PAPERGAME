@@ -69,6 +69,7 @@ const BLUEPRINT_TYPES = {
   recurveBow:   { name: 'Recurve Bow',   from: ['champion', 'mimic', 'boss'] },
   boomerang:    { name: 'Boomerang',     from: ['champion', 'mimic', 'boss'] },
   ironKnuckles: { name: 'Iron Knuckles', from: ['champion', 'mimic', 'boss'] },
+  craneBlade:   { name: 'Paper Crane Blade', from: ['champion', 'mimic', 'boss'] },
   gnome:        { name: 'Gnome Gear',    from: ['gnome'] },
   gargoyleClaw: { name: 'Gargoyle Claw', from: ['gargoyle'] },
   hexLightning: { name: 'Hex Lightning', from: ['gargoyle'] }

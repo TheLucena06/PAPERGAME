@@ -13,3 +13,5 @@ Made with Phaser 3, runs offline, works on PC (keyboard, mouse, gamepad) and on 
 Offline / lab PCs: download this repo as a ZIP (Code → Download ZIP), unzip, open `index.html`.
 
 Docs: `VISION.md` (the plan), `ROADMAP.md`, `CONTENT.md` (every item and change), `NOTES.md` (code notes).
+
+**Team / contributors:** read `COLABORAR.md` (pt-BR). Claude reads `CLAUDE.md` automatically.
