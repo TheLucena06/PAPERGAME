@@ -67,7 +67,8 @@ const BRAWL_TYPES = {
 };
 
 const TOWN_RULES = {
-  roomCols: 20, roomRows: 13,                 // town + prison rooms are bigger than the screen (they scroll)
+  roomCols: 15, roomRows: 10,                 // town + prison rooms: mostly the regular size...
+  largeCols: 20, largeRows: 13, largeChance: 0.25,   // ...25% are bigger than the screen (they scroll)
   cart: { everyMs: [4500, 7500], warnMs: 1000, speed: [165, 205], max: 2, len: 104, wide: 58,
           playerDamage: 6, enemyDamage: 22, hitCdMs: 800, shoveSpeed: 260, shoveMs: 200 },
   restrain: { ms: 4000, maxStacks: 3, slowPer: 0.12, defPer: 0.1 }   // Brigade Guard: per stack
@@ -340,6 +341,26 @@ const TownGen = {
     room.townTiles = tiles;
   },
 
+  // Anything the player can't walk to (a pocket behind booths or cells) is filled in, so nothing spawns there.
+  fillPockets(g, tiles, L, filler) {
+    const ih = g.length, iw = g[0].length, seen = [];
+    for (let r = 0; r < ih; r++) seen.push(new Array(iw).fill(false));
+    const q = [[L.mcI, L.mrI]];
+    if (g[L.mrI][L.mcI] !== '.') return;
+    seen[L.mrI][L.mcI] = true;
+    while (q.length) {
+      const [c, r] = q.pop();
+      for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const x = c + dc, y = r + dr;
+        if (x < 0 || y < 0 || x >= iw || y >= ih || seen[y][x] || g[y][x] !== '.') continue;
+        seen[y][x] = true; q.push([x, y]);
+      }
+    }
+    for (let r = 0; r < ih; r++) for (let c = 0; c < iw; c++) if (g[r][c] === '.' && !seen[r][c]) { g[r][c] = '#'; tiles[c + ',' + r] = filler; }
+  },
+  // The cross through the four doors: never blocked.
+  corridor(L, c, r) { return (r >= L.mrI - 1 && r <= L.mrI) || (c >= L.mcI - 1 && c <= L.mcI + 1); },
+
   market(room, cols, rows, big) {
     const iw = cols - 2, ih = rows - 2, L = this.lanes(cols, rows), g = this.blank(iw, ih), tiles = {};
     const free = (c, r) => c >= 0 && r >= 0 && c < iw && r < ih && !L.inH(r) && !L.inV(c) && g[r][c] === '.';
@@ -354,45 +375,96 @@ const TownGen = {
         put(c, row, 'stall' + v + 'L'); put(c + 1, row, 'stall' + v + 'R');
       }
     }
-    // wells (1, or 2 in the big plaza) and some crates / barrels
+    // wells (1, or 2 in the big plaza) and some crates / barrels (off the walls and the streets)
     const spots = [];
-    for (let r = 1; r < ih - 1; r++) for (let c = 1; c < iw - 1; c++) if (free(c, r) && !L.inH(r - 1) && !L.inH(r + 1)) spots.push([c, r]);
+    for (let r = 1; r < ih - 1; r++) for (let c = 1; c < iw - 1; c++) {
+      if (!free(c, r)) continue;
+      if (big || cols > 15) { if (!L.inH(r - 1) && !L.inH(r + 1)) spots.push([c, r]); }
+      else spots.push([c, r]);
+    }
     const take = () => spots.length ? spots.splice(Math.floor(Math.random() * spots.length), 1)[0] : null;
     for (let i = 0; i < (big ? 2 : 1); i++) { const s = take(); if (s) put(s[0], s[1], 'well'); }
-    const n = (big ? 5 : 3) + Math.floor(Math.random() * 2);
+    const n = (big ? 5 : cols > 15 ? 3 : 2) + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) { const s = take(); if (s) put(s[0], s[1], Math.random() < 0.5 ? 'crate' : 'barrel'); }
+    this.fillPockets(g, tiles, L, 'crate');
     this.finish(room, cols, rows, g, tiles);
   },
 
-  prison(room, cols, rows) {
+  /* Prison rooms: one of five layouts. A cell = { c0, c1, r0, r1, dc, dr, dir } (interior coords; dc/dr = its open
+     door tile; dir = the way out of the door). */
+  PRISON_LAYOUTS: ['cellsTB', 'cellsLR', 'hall', 'pens', 'block'],
+  prison(room, cols, rows, big) {
     const iw = cols - 2, ih = rows - 2, L = this.lanes(cols, rows), g = this.blank(iw, ih), tiles = {}, cells = [];
-    const set = (c, r, k) => { g[r][c] = '#'; tiles[c + ',' + r] = k; };
-    // cell blocks along the top and bottom walls; every cell's door is broken open
-    const bands = [{ inner: [0, 1], bars: 2 }, { inner: [ih - 1, ih - 2], bars: ih - 3 }];
-    const regions = [{ a: 0, b: L.mcI - 3, wallAt: 'end' }, { a: L.mcI + 3, b: iw - 1, wallAt: 'start' }];
-    for (const bd of bands) for (const rg of regions) {
-      const spans = [];
-      let c = rg.a;
-      if (rg.wallAt === 'start') { for (const r of bd.inner) set(c, r, 'cellWall'); set(c, bd.bars, 'cellWall'); c++; }
-      while (c <= rg.b) {
-        const end = Math.min(rg.b - (rg.wallAt === 'end' ? 1 : 0), c + 1);
-        if (end < c) break;
-        spans.push([c, end]);
-        c = end + 1;
-        if (c <= rg.b) { for (const r of bd.inner) set(c, r, 'cellWall'); set(c, bd.bars, 'cellWall'); c++; }
+    const ok = (c, r) => c >= 0 && r >= 0 && c < iw && r < ih && !this.corridor(L, c, r);
+    const set = (c, r, k) => { if (!ok(c, r)) return false; g[r][c] = '#'; tiles[c + ',' + r] = k; return true; };
+    const open = (c, r) => { g[r][c] = '.'; delete tiles[c + ',' + r]; };
+    const kind = this.PRISON_LAYOUTS[Math.floor(Math.random() * this.PRISON_LAYOUTS.length)];
+    room.prisonLayout = kind;
+
+    // a row of cells along a wall. side: 'top' | 'bottom' | 'left' | 'right'; [a, b] = the span along that wall
+    const wallCells = (side, a, b) => {
+      const horiz = side === 'top' || side === 'bottom';
+      const inner = side === 'top' ? [0, 1] : side === 'bottom' ? [ih - 1, ih - 2] : side === 'left' ? [0, 1] : [iw - 1, iw - 2];
+      const front = side === 'top' ? 2 : side === 'bottom' ? ih - 3 : side === 'left' ? 2 : iw - 3;
+      const dir = side === 'top' ? 'down' : side === 'bottom' ? 'up' : side === 'left' ? 'right' : 'left';
+      const at = (along, across) => horiz ? [along, across] : [across, along];
+      let x = a;
+      while (x + 1 <= b) {
+        const x1 = Math.min(b, x + 1);
+        let fine = true;
+        for (let k = x; k <= x1; k++) { for (const i of inner) { const [c, r] = at(k, i); if (!ok(c, r)) fine = false; } const [c, r] = at(k, front); if (!ok(c, r)) fine = false; }
+        if (!fine) { x++; continue; }
+        for (let k = x; k <= x1; k++) { const [c, r] = at(k, front); set(c, r, 'bars'); }
+        const sep = x1 + 1;                                   // the wall between this cell and the next
+        if (sep <= b) { for (const i of inner) { const [c, r] = at(sep, i); set(c, r, 'cellWall'); } const [c, r] = at(sep, front); set(c, r, 'cellWall'); }
+        const door = x + Math.floor(Math.random() * (x1 - x + 1)), [dc, dr] = at(door, front);
+        open(dc, dr);
+        const [c0, r0] = at(x, Math.min(inner[0], inner[1])), [c1, r1] = at(x1, Math.max(inner[0], inner[1]));
+        cells.push({ c0: Math.min(c0, c1), c1: Math.max(c0, c1), r0: Math.min(r0, r1), r1: Math.max(r0, r1), dc: dc, dr: dr, dir: dir });
+        x = sep + 1;
       }
-      for (const [c0, c1] of spans) {
-        for (let x = c0; x <= c1; x++) set(x, bd.bars, 'bars');
-        const door = c0 + Math.floor(Math.random() * (c1 - c0 + 1));
-        g[bd.bars][door] = '.'; delete tiles[door + ',' + bd.bars];
-        cells.push({ c0: c0, c1: c1, r0: Math.min(bd.inner[0], bd.inner[1]), r1: Math.max(bd.inner[0], bd.inner[1]), door: door, doorRow: bd.bars, top: bd.bars === 2 });
+    };
+    // a free-standing pen: bars all round a 2x1 (or 2x2) floor, door on one side
+    const pen = (c, r, w, h) => {
+      for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) if (!ok(x, y) || g[y][x] !== '.') return false;
+      for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) {
+        const edge = y === r || y === r + h - 1 || x === c || x === c + w - 1;
+        if (edge) set(x, y, (x === c || x === c + w - 1) && (y === r || y === r + h - 1) ? 'cellWall' : 'bars');
       }
+      const sides = [['up', c + 1 + Math.floor(Math.random() * (w - 2)), r], ['down', c + 1 + Math.floor(Math.random() * (w - 2)), r + h - 1],
+                     ['left', c, r + 1 + Math.floor(Math.random() * (h - 2))], ['right', c + w - 1, r + 1 + Math.floor(Math.random() * (h - 2))]];
+      const s = sides[Math.floor(Math.random() * 4)];
+      open(s[1], s[2]);
+      cells.push({ c0: c + 1, c1: c + w - 2, r0: r + 1, r1: r + h - 2, dc: s[1], dr: s[2], dir: s[0] });
+      return true;
+    };
+    const left = [0, L.mcI - 2], right = [L.mcI + 2, iw - 1], top = [0, L.mrI - 2], bottom = [L.mrI + 1, ih - 1];
+    if (kind === 'cellsTB') {
+      for (const side of ['top', 'bottom']) { wallCells(side, left[0], left[1]); wallCells(side, right[0], right[1]); }
+    } else if (kind === 'cellsLR') {
+      for (const side of ['left', 'right']) { wallCells(side, top[0], top[1]); wallCells(side, bottom[0], bottom[1]); }
+    } else if (kind === 'hall') {
+      // a guard hall: rows of stone pillars
+      for (let r = 1; r < ih - 1; r += 3) for (let c = 1; c < iw - 1; c += 3) set(c, r, 'cellWall');
+    } else if (kind === 'pens') {
+      // free-standing pens in the corners of the yard
+      const w = 4, h = big || ih >= 11 ? 4 : 3;
+      for (const [cx, cy] of [[left[0] + 1, top[0] + (ih >= 11 ? 1 : 0)], [right[1] - w, top[0] + (ih >= 11 ? 1 : 0)], [left[0] + 1, bottom[1] - h + 1 - (ih >= 11 ? 1 : 0)], [right[1] - w, bottom[1] - h + 1 - (ih >= 11 ? 1 : 0)]]) {
+        if (Math.random() < 0.8) pen(cx, cy, w, h);
+      }
+    } else {
+      // 'block': cells on one wall, pillars on the other half
+      const side = Math.random() < 0.5 ? 'top' : 'bottom';
+      wallCells(side, left[0], left[1]); wallCells(side, right[0], right[1]);
+      const rows2 = side === 'top' ? [bottom[0] + 1, ih - 2] : [1, top[1] - 1];
+      for (let r = rows2[0]; r <= rows2[1]; r += 3) for (let c = 1; c < iw - 1; c += 3) set(c, r, 'cellWall');
     }
-    // a couple of barrels in the yard
+    // a couple of barrels / crates in the yard
     for (let i = 0; i < 2; i++) {
-      const r = Math.random() < 0.5 ? 3 : ih - 4, c = Math.random() < 0.5 ? 1 + Math.floor(Math.random() * (L.mcI - 4)) : L.mcI + 4 + Math.floor(Math.random() * (iw - L.mcI - 5));
-      if (r > 2 && r < ih - 3 && !L.inH(r) && !L.inV(c) && g[r][c] === '.') set(c, r, Math.random() < 0.5 ? 'barrel' : 'crate');
+      const c = Math.floor(Math.random() * iw), r = Math.floor(Math.random() * ih);
+      if (ok(c, r) && g[r][c] === '.' && c > 0 && r > 0 && c < iw - 1 && r < ih - 1 && !cells.some((q) => c >= q.c0 - 1 && c <= q.c1 + 1 && r >= q.r0 - 1 && r <= q.r1 + 1)) set(c, r, Math.random() < 0.5 ? 'barrel' : 'crate');
     }
+    this.fillPockets(g, tiles, L, 'cellWall');
     room.prisonCells = cells;
     this.finish(room, cols, rows, g, tiles);
   },
@@ -409,8 +481,12 @@ const TownGen = {
     for (let i = 0; i < map.rooms.length; i++) {
       const r = map.rooms[i];
       if (r.type !== 'normal' && r.type !== 'start' && r.type !== 'exit') continue;
-      const big = r === br, cols = big ? BRAWL_TYPES[st.brawl].cols : R.roomCols, rows = big ? BRAWL_TYPES[st.brawl].rows : R.roomRows;
-      if (style === 'town') this.market(r, cols, rows, big); else this.prison(r, cols, rows);
+      // mostly regular rooms (15x10); some bigger ones (20x13); the brawl room is the biggest (24x15)
+      const brawl = r === br, large = !brawl && r.type !== 'start' && Math.random() < R.largeChance;
+      const cols = brawl ? BRAWL_TYPES[st.brawl].cols : large ? R.largeCols : R.roomCols;
+      const rows = brawl ? BRAWL_TYPES[st.brawl].rows : large ? R.largeRows : R.roomRows;
+      if (style === 'town') this.market(r, cols, rows, brawl); else this.prison(r, cols, rows, brawl);
+      const big = brawl;
       if (big) r.brawl = st.brawl;
     }
   }
@@ -830,14 +906,18 @@ const TownMixin = {
     if (room.prisonCells) for (const c of room.prisonCells) {
       const x0 = (c.c0 + 1) * T, y0 = (c.r0 + 1) * T, w = (c.c1 - c.c0 + 1) * T, h = (c.r1 - c.r0 + 1) * T;
       g.fillStyle(0x3b342d, 0.85); g.fillRect(x0, y0, w, h);
-      g.fillStyle(0xc9a94a, 0.8); g.fillRoundedRect(x0 + 8, y0 + (c.top ? 8 : h - 34), Math.min(w - 16, 70), 26, 6);
-      g.fillStyle(0x6d4c41, 1); g.fillCircle(x0 + w - 16, y0 + h / 2, 7);
-      const dx = (c.door + 1) * T, dy = (c.doorRow + 1) * T, sy = c.top ? dy + T : dy;
-      const ex = dx + 16, ey = sy + (c.top ? 50 : -50);                                           // the barred door, swung open
-      g.lineStyle(7, 0x37474f, 1); g.lineBetween(dx + 4, sy, ex, ey);
-      g.lineStyle(3, 0x90a4ae, 1); g.lineBetween(dx + 4, sy, ex, ey);
-      g.fillStyle(0x263238, 1); g.fillCircle(dx + 4, sy, 5);
-      g.fillStyle(0x1b1512, 0.6); g.fillRect(dx + 2, dy + 2, T - 4, T - 4);
+      const vert = c.dir === 'up' || c.dir === 'down';
+      const far = c.dir === 'down' || c.dir === 'right';                                          // the bed goes away from the door
+      if (vert) { g.fillStyle(0xc9a94a, 0.8); g.fillRoundedRect(x0 + 8, far ? y0 + 6 : y0 + h - 32, Math.min(w - 16, 70), 26, 6); }
+      else { g.fillStyle(0xc9a94a, 0.8); g.fillRoundedRect(far ? x0 + 6 : x0 + w - 32, y0 + 8, 26, Math.min(h - 16, 70), 6); }
+      g.fillStyle(0x6d4c41, 1); g.fillCircle(x0 + w / 2 + (vert ? w / 2 - 16 : 0), y0 + h / 2 + (vert ? 0 : h / 2 - 16), 7);   // the bucket
+      const tx = (c.dc + 1) * T, ty = (c.dr + 1) * T;
+      g.fillStyle(0x1b1512, 0.6); g.fillRect(tx + 2, ty + 2, T - 4, T - 4);
+      const hx = c.dir === 'right' ? tx + T : c.dir === 'left' ? tx : tx + 4, hy = c.dir === 'down' ? ty + T : c.dir === 'up' ? ty : ty + 4;
+      const ex = hx + (c.dir === 'right' ? 50 : c.dir === 'left' ? -50 : 12), ey = hy + (c.dir === 'down' ? 50 : c.dir === 'up' ? -50 : 12);
+      g.lineStyle(7, 0x37474f, 1); g.lineBetween(hx, hy, ex, ey);                                // the barred door, swung open
+      g.lineStyle(3, 0x90a4ae, 1); g.lineBetween(hx, hy, ex, ey);
+      g.fillStyle(0x263238, 1); g.fillCircle(hx, hy, 5);
     }
   }
 };

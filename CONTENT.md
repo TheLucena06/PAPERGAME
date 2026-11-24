@@ -20,6 +20,16 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## v3.3.1 fixes
+- Market Town / Prison rooms: mostly regular size again (15×10); 25% are bigger (20×13); brawl rooms stay 24×15.
+  Levels keep their +2 rooms.
+- Prison rooms now use 5 layouts: cells on the top/bottom walls, cells on the left/right walls, pillar hall,
+  free-standing pens, and cells on one wall + pillars. Any spot you can't walk to is filled in (nothing spawns there).
+- Lovestruck: a charmed enemy now follows where you ARE (it was steering toward where you stood when it got charmed,
+  so it walked into walls). A charmed Dark Skeleton that falls into bones stops being lovestruck (no Heartbreak) and
+  gets back up as normal (the bones used to be dragged around).
+- Dark rooms: torches you lit stay lit when you come back (they were wiped when you left the room).
+
 ## Castle path rebuilt: Market Town → Prison → Warden (v3.3) – js/castletown.js
 - Stage 2 "The Paper Castle" now has its OWN steps: Market Town level → Prison level → quick shop → Warden.
   No arena on this path (each level has a brawl room instead). The Sewer path is unchanged (level, arena, level, boss).
