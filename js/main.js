@@ -515,6 +515,7 @@ class GameScene extends Phaser.Scene {
     this.setupCupid();                           // Lovestruck, Cupid's Flight trails (cupid.js)
     this.setupMiner();                           // Mine Train, coal smudges (miner.js)
     this.setupGrave();                           // sections: the Necrotery graveyard (graveyard.js)
+    this.setupTown();                            // Castle path: market town carts, prison guards (castletown.js)
     this.setupHunter();                          // traps, hawks, marks (hunter.js)                         // potions on the floor (pickups.js)                            // darkness, torches, burning floors, the Dead Titan (lighting.js, necrotery.js, titan.js)
     this.zones = new ZoneManager(this);          // lasting spell areas (Hurricane, Fire Pillar, storms...)
     // Save data: bestiary pages + kit unlocks (not in the Test Dungeon)
@@ -543,23 +544,26 @@ class GameScene extends Phaser.Scene {
     const levelsPerStage = RUN_PLAN.steps.filter((s) => s === 'level').length;
     let n = Math.max(1, startLevel || 1);
     let stageIdx = Math.min(RUN_PLAN.stages.length - 1, Math.floor((n - 1) / levelsPerStage));
-    let stageId = null;
+    let stageId = null, subLevel = -1;
     if (dbg && dbg.startSection) {             // debug menu: start in a chosen section (e.g. the Castle instead of the Sewer)
-      const want = RUN_PLAN.stages.findIndex((opts) => opts.indexOf(dbg.startSection) !== -1);
+      const want = runStageIndex(dbg.startSection);              // castletown.js: also finds a stage's levels ('town', 'prison')
       if (want !== -1) {
-        stageId = dbg.startSection;
-        if (want !== stageIdx) { stageIdx = want; n = want * levelsPerStage + 1; }
+        stageId = runStageParent(dbg.startSection);
+        const lv = STAGE_TYPES[stageId].levels;
+        if (lv && lv.indexOf(dbg.startSection) !== -1) subLevel = lv.indexOf(dbg.startSection);
+        if (want !== stageIdx || subLevel !== -1) { stageIdx = want; n = want * levelsPerStage + 1 + Math.max(0, subLevel); }
       }
     }
     const within = (n - 1) - stageIdx * levelsPerStage;          // 0 = first level of the stage
+    const sid = stageId || RUN_PLAN.stages[stageIdx][0], steps = STAGE_TYPES[sid].steps || RUN_PLAN.steps;   // a stage can have its own steps
     let step = 0, seen = -1;
-    for (let i = 0; i < RUN_PLAN.steps.length; i++) if (RUN_PLAN.steps[i] === 'level' && ++seen === within) { step = i; break; }
-    this.run = { stageNum: stageIdx + 1, stageId: stageId || RUN_PLAN.stages[stageIdx][0], step: step, levelNum: n - 1, path: [], reserved: [] };
+    for (let i = 0; i < steps.length; i++) if (steps[i] === 'level' && ++seen === within) { step = i; break; }
+    this.run = { stageNum: stageIdx + 1, stageId: sid, step: step, levelNum: n - 1, path: [], reserved: [] };
     if (dbg && dbg.skippedBossesCount) this.bossesBeaten = stageIdx;
     if (dbg && dbg.bossesBeaten) this.bossesBeaten = dbg.bossesBeaten;   // debug: see later shop tiers
     this.enemies.bossesBeaten = this.bossesBeaten;
     this.applyStage();
-    if (dbg && dbg.bossNow) { this.run.step = RUN_PLAN.steps.indexOf('boss'); this.level = Math.max(1, this.run.levelNum); }
+    if (dbg && dbg.bossNow) { this.run.step = this.runSteps().indexOf('boss'); this.applyStage(); this.level = Math.max(1, this.run.levelNum); }
     if (dbg && dbg.startInShop && !dbg.bossNow) {
       this.level = Math.max(1, n - 1);
       this.run.levelNum = n - 1;
@@ -576,7 +580,8 @@ class GameScene extends Phaser.Scene {
 
   stage() {
     if (this.testMode) return STAGE_TYPES[this.testStage || 'notebook'];      // Test Dungeon: the section picked in its panel
-    return STAGE_TYPES[this.run ? this.run.stageId : 'notebook'];
+    const st = STAGE_TYPES[this.run ? this.run.stageId : 'notebook'];
+    return (st.levels && this.run) ? STAGE_TYPES[st.levels[Math.min(st.levels.length - 1, this.stageLevelIdx())]] : st;   // Castle: town, then prison
   }
 
   // Look + enemy pool of the current stage.
@@ -589,7 +594,8 @@ class GameScene extends Phaser.Scene {
 
   // Starts whatever the current step of the stage is.
   runStep() {
-    const step = RUN_PLAN.steps[this.run.step];
+    const step = this.runSteps()[this.run.step];
+    this.applyStage();                           // a stage's levels can look different (Castle: town, then prison)
     this.planMerchant();
     if (step === 'level') { this.run.levelNum++; this.startLevel(this.run.levelNum); }
     else if (step === 'arena') this.startArena();
@@ -599,7 +605,7 @@ class GameScene extends Phaser.Scene {
   advanceRun() {
     this.merchantStepEnd();
     this.run.step++;
-    if (this.run.step < RUN_PLAN.steps.length) { this.runStep(); return; }
+    if (this.run.step < this.runSteps().length) { this.runStep(); return; }
     // stage finished
     if (this.run.stageNum >= RUN_PLAN.stages.length) { this.winRun(); return; }
     const options = RUN_PLAN.stages[this.run.stageNum];
@@ -661,6 +667,10 @@ class GameScene extends Phaser.Scene {
       this.drawNecroFloor(g, W, H, look);
     } else if (look.style === 'graveyard') {
       this.drawGraveFloor(g, W, H, look);
+    } else if (look.style === 'town') {
+      this.drawTownFloor(g, W, H, look);
+    } else if (look.style === 'prison') {
+      this.drawPrisonFloor(g, W, H, look);
     } else if (look.style === 'castle') {
       g.lineStyle(1, look.line, 0.8);
       for (let y = 0, row = 0; y < H; y += 48, row++) {
@@ -877,7 +887,7 @@ class GameScene extends Phaser.Scene {
     this.level = Math.max(1, dbg.startLevel);
     if (dbg.testSection) {                         // the section's first level (unless Start level is already inside it)
       const lps = RUN_PLAN.steps.filter((q) => q === 'level').length;
-      const idx = RUN_PLAN.stages.findIndex((opts) => opts.indexOf(this.testStage) !== -1);
+      const idx = runStageIndex(this.testStage);
       if (Math.floor((this.level - 1) / lps) !== idx) this.level = idx * lps + 1;
     }
     if (dbg.testLoadout) TestPanel.applyLoadout(this.players[0], dbg.testLoadout);   // test gear stays between visits
@@ -917,12 +927,13 @@ class GameScene extends Phaser.Scene {
     this.enemies.bossesBeaten = this.bossesBeaten;
     if (!this.testMode) { SaveData.reachedLevel(n); SaveData.flush(); }
     this.minorWorms.startMinor('smallWorm', this.enemies.hpMul, this.enemies.dmgMul, this.players.length, this.wormCallbacks());
-    const roomCount = Math.min(lv.roomsMax, lv.roomsBase + Math.floor((n - 1) / lv.extraRoomEvery));
     const st = this.run ? this.stage() : STAGE_TYPES.notebook;
+    const roomCount = Math.min(lv.roomsMax + (st.roomsBonus || 0), lv.roomsBase + Math.floor((n - 1) / lv.extraRoomEvery) + (st.roomsBonus || 0));
     const theme = st.themes[Math.floor(Math.random() * st.themes.length)];
     this.map = LevelGenerator.generate(n, roomCount, lv.gridSize, { specials: true, theme: theme, merchant: this.merchantHere === 'sell' || this.merchantHere === 'deliver' });
     if (st.look && st.look.dark) NecroRooms.shape(this.map);        // halls, galleries, crypts
     if (this.run) this.assignSections(this.map, st);                // graveyard rooms etc. (graveyard.js)
+    if (this.run) this.townAssign(this.map, st);                    // town / prison rooms + the brawl room (castletown.js)
     if (this.merchantHere === 'deliver') {               // he waits for you: his room is on the map from the start
       const mr = this.map.rooms.find((r) => r.type === 'merchant');
       if (mr) mr.revealed = true;
@@ -982,6 +993,7 @@ class GameScene extends Phaser.Scene {
 
     this.necroRoom(room);
     this.graveRoom(room);
+    this.townRoom(room);
     this.hunterRoom();
     this.transitionLockMs = 250;
     this.hud.drawMinimap(this.map, room);
@@ -992,6 +1004,7 @@ class GameScene extends Phaser.Scene {
   startRoomFight(room) {
     this.roomFirstKill = false;      // for the gnome secret
     if (room.type === 'arena') { this.startArenaFight(room); return; }
+    if (room.brawl) { this.startBrawl(room); return; }               // market / prison brawl (castletown.js)
     if (room.theme) { this.startThemedFight(room); return; }
     const cfg = GAME_CONFIG, lv = cfg.levels;
     let budget = lv.baseBudget + (this.level - 1) * lv.budgetPerLevel;
@@ -1053,7 +1066,8 @@ class GameScene extends Phaser.Scene {
       this.advanceRun();
     } else {
       this.earnShavings(SHAVINGS_EARN.level);
-      const next = RUN_PLAN.steps[this.run.step + 1];
+      const next = this.runSteps()[this.run.step + 1];
+      if (this.stage().look.style === 'town') this.hud.showBanner('Through the gate...');
       if (next === 'boss') {
         this.openShop({ subtitle: 'Level cleared · ' + this.bossName(this.stage().boss) + ' awaits', after: () => this.advanceRun() });
       } else {
@@ -1149,12 +1163,13 @@ class GameScene extends Phaser.Scene {
     this.rollRoomPotion(room);
     if (room.type === 'exit') this.rooms.showHatch();
     if (room.type === 'arena') { this.arenaReward(room); this.rooms.showHatch(); this.earnShavings(SHAVINGS_EARN.arena); }
+    if (room.brawl) this.brawlReward(room);
     this.hud.drawMinimap(this.map, room);
   }
 
   checkRoomState() {
     if (this.room.type === 'boss' || this.room.type === 'test') return;   // the boss decides when the arena is cleared
-    if (this.room.type === 'arena' && this.arena && this.arena.kind === 'survival') return;   // the timer decides
+    if (this.arena && this.arena.kind === 'survival') return;   // the timer decides (survival arena, brawls)
     if (!this.room.cleared && this.room.fightStarted && this.enemies.isEmpty() && this.minorWorms.worms.length === 0) {
       if (this.room.waves && this.room.waves.length) { this.spawnThemedWave(this.room); return; }
       this.onRoomCleared();
@@ -1276,6 +1291,7 @@ class GameScene extends Phaser.Scene {
     this.updateMiner(dt);
     this.updateRussi(dt);
     this.updateGrave(dt);
+    this.updateTown(dt);
     this.lighting.update(dt);
     this.hud.drawBoss(dt);
     this.hud.updatePanel(this.players, this.team, this.level, this.elapsedMs);
@@ -1417,6 +1433,7 @@ class GameScene extends Phaser.Scene {
     this.ribTrapCheck(p, res, attacker);              // Titan Ribcage armor
     this.thornsCheck(p, res, attacker);               // Thorn Armor
     this.hexCheck(p, res, attacker);                  // gargoyles hex you
+    this.townHitCheck(p, res, attacker);              // Brigade Guards shove + restrain
     if (res === 'dodge') this.hud.floatText(p.sprite.x, p.sprite.y - 26, 'Dodge', '#1565c0');
     // Amulet Robe: whoever hits you gets stunned, shorter for tanky enemies
     if (p.stats.stunOnHit > 0 && attacker && attacker.active && attacker.isEnemy) {
@@ -1656,7 +1673,7 @@ class GameScene extends Phaser.Scene {
 
 /* ---------- Game Over ---------- */
 // merchant / treasure / shrine / themed rooms / arena / enemy bosses (specials.js)
-Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, RussiMixin, GraveMixin);
+Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, RussiMixin, GraveMixin, TownMixin);
 
 class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOverScene'); }

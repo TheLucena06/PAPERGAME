@@ -347,7 +347,7 @@ class Hud {
     if (kills !== ca.kills || sec !== ca.sec || level !== ca.level) {
       ca.kills = kills; ca.sec = sec; ca.level = level;
       const run = this.scene.run;
-      this.infoText.setText((run ? STAGE_TYPES[run.stageId].name + ' · ' : '') + 'Level ' + level + '    Kills ' + kills + '    ' + sec + 's');
+      this.infoText.setText((run ? this.scene.stage().name + ' · ' : '') + 'Level ' + level + '    Kills ' + kills + '    ' + sec + 's');
     }
   }
 
@@ -774,9 +774,18 @@ class Hud {
         if (e.state === 'bitten') { g.lineStyle(6, 0xe57373, 1); g.lineBetween(e.x, e.y + 4, e.x, e.y + 16); }
       }
       if (d.ai === 'warden' && e.ballX !== undefined) {         // ball and chain, throw line, cells
-        g.lineStyle(3, 0x455a64, 1); g.lineBetween(e.x, e.y, e.ballX, e.ballY);
-        g.fillStyle(0x37474f, 1); g.fillCircle(e.ballX, e.ballY, d.ball.radius);
-        g.fillStyle(0x78909c, 1); g.fillCircle(e.ballX - 5, e.ballY - 5, 5);
+        const cdx = e.ballX - e.x, cdy = e.ballY - e.y, clen = Math.sqrt(cdx * cdx + cdy * cdy) || 1, links = Math.max(2, Math.floor(clen / 11));
+        g.lineStyle(2.5, 0x546e7a, 1);                          // chain links
+        for (let k = 1; k < links; k++) g.strokeCircle(e.x + cdx * k / links, e.y + cdy * k / links, 3.5);
+        const sa = this.scene.time.now / 160;                   // spiked ball (The Jailer)
+        g.fillStyle(0x90a4ae, 1);
+        for (let k = 0; k < 8; k++) {
+          const a = sa + k * Math.PI / 4, r0 = d.ball.radius - 2, r1 = d.ball.radius + 8;
+          g.fillTriangle(e.ballX + Math.cos(a - 0.22) * r0, e.ballY + Math.sin(a - 0.22) * r0, e.ballX + Math.cos(a) * r1, e.ballY + Math.sin(a) * r1, e.ballX + Math.cos(a + 0.22) * r0, e.ballY + Math.sin(a + 0.22) * r0);
+        }
+        g.fillStyle(0x455a64, 1); g.fillCircle(e.ballX, e.ballY, d.ball.radius);
+        g.lineStyle(2, 0x263238, 1); g.strokeCircle(e.ballX, e.ballY, d.ball.radius);
+        g.fillStyle(0x90a4ae, 0.6); g.fillCircle(e.ballX - 5, e.ballY - 5, 5);
         if (e.state === 'throw' || e.state === 'spin' || e.state === 'reel') {   // hint: it can be knocked back with a dash attack
           g.lineStyle(2, 0xffd54f, 0.35 + 0.25 * Math.sin(this.scene.time.now / 90)); g.strokeCircle(e.ballX, e.ballY, d.ball.radius + 5);
         }

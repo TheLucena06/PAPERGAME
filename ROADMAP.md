@@ -72,6 +72,11 @@ ships as a playable zip. Content details with numbers: CONTENT.md.
   ribcage traps, spinning beams from the middle, summons, and a roar that blows out every torch. Phase 2 at half HP.
 - Boss loot: Titan's Wrath (mega spell) and the Titan Ribcage (armor). Fire attacks now leave the floor burning.
 - The run ends after the Dead Titan (for now). Next: ★★★★ gear tier for after boss 3.
+## v3.3 – Castle path rebuilt  ✅ (PR: lucena/castle-town-prison)
+- Market Town level (shop carts, market brawl) → prison gate → Prison level (Mace Guard, Brigade Guard, prison brawl)
+  → quick shop → the Warden (new "Jailer" look). Sewer path unchanged.
+- Ideas for later: town NPCs / shopkeepers fleeing, a cart you can ride, prisoners you can free for a reward.
+
 ## Phase 4 – Melee: Paladin, Heavy, Samurai, more shields, late-game sword projectiles.
 - Heavy is MERGED into Berserker (owner, Alpha 3.2). Berserker = big, slow, hits hard; only axes get the low-HP boost.
 - Started early: Tower Shield (Berserker). Raise to block 60% (walk slower), hold 0.7 s and let go to slam it into

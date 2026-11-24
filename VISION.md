@@ -17,6 +17,7 @@ Built:
 - [x] Survival / mini-boss arena between bosses, camera on the player
 - [x] Pencil Case perma upgrades, knockoff PS2 controller setup, auto-aim kept
 - [x] Visually distinct stages with their own enemies and bosses (Notebook, Ink Sewers, Paper Castle, Necrotery)
+- [x] Castle path rebuilt: Market Town (shop carts, market brawl) → Prison (Mace + Brigade Guards, prison brawl) → Warden (new Jailer look)
 - [x] The gnome + secret kit
 - [x] Sections: Necrotery graveyard (rain, lightning, breakable tombs, Gargoyles, Demonic Gargoyle mini-boss)
 - [x] Heavy merged into Berserker (owner's call): Tower Shield, Boulder, Earthbreaker hammer, Earthsplitter rock line,
