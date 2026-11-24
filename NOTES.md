@@ -189,6 +189,11 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 - Levels per stage are still counted from RUN_PLAN.steps (2): the castle also has 2 levels, keep it that way or fix startRun.
 - TownGen.assign (after LevelGenerator) gives normal/start/exit rooms a 20×13 layout (`room.townTiles` = block texture per
   interior tile, `room.prisonCells` for the floor) and picks the brawl room (`room.brawl`). townRoom() re-textures blocks.
+- Room sizes: TOWN_RULES roomCols/Rows (15×10) + largeChance (25%) of largeCols/Rows (20×13). Prison layouts:
+  TownGen.PRISON_LAYOUTS; cells are {c0,c1,r0,r1,dc,dr,dir}. TownGen.corridor keeps the cross through the doors
+  clear; fillPockets fills any tile not reachable from the room centre.
+- Lighting.setRoom makes a NEW torches array (room.torches is shared with the room: clearing it in place wiped it).
+- LoveFx.step refreshes e.tdx/tdy/hasLos (steer() reads them) and drops the love when the enemy is a bone pile.
 - Lanes: the street through the side doors (tile rows mr-2..mr+1 interior) and through the up/down doors (mc±2) are kept
   clear; carts only run on a lane that is fully clear (setupCartLanes). Carts are drawn on `cartG` at depth −1 so they slide
   out from under the walls.

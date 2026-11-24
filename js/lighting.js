@@ -63,7 +63,7 @@ class Lighting {
   setRoom(dark) {
     this.active = !!dark;
     this.rt.setVisible(this.active);
-    this.torches.length = 0;
+    this.torches = [];                                   // a NEW array: the old one belongs to the last room (room.torches), keep it intact
     for (let i = 0; i < this.fires.length; i++) this.fires[i].active = false;
     this.rewarded = false;
     this.top.clear(); this.floor.clear();

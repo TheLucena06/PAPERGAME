@@ -194,12 +194,18 @@ const LoveFx = {
   // Called from the enemy update loop. Returns true when it handled the enemy this frame (skip its AI).
   step(m, e, dt, ctx) {
     const scene = m.scene;
+    // fell into a pile of bones (Necrotery skeletons): the love is over, no Heartbreak; the bones get up as normal
+    if (e.state === 'bones' || e.state === 'dust') { e.loveUntil = 0; e.loveBoss = false; e.loveOwner = null; e.loveDecoy = null; return false; }
     if (scene.time.now >= e.loveUntil) { this.heartbreak(scene, e); return !e.active; }
     if (e.loveBoss) return false;
     const t = m.findNearestAlive(ctx.players, e.x, e.y, e);
     e.state = 'move';
     if (!t) { e.setVelocity(0, 0); return true; }
     const dx = t.sprite.x - e.x, dy = t.sprite.y - e.y;
+    // steer() reads these: keep them fresh, or it walks toward where you were when it got charmed
+    e.tdx = dx; e.tdy = dy; e.tdist = Math.max(0.001, Math.sqrt(dx * dx + dy * dy));
+    e.losMs -= dt;
+    if (e.losMs <= 0) { e.losMs = ENEMY_LOS_INTERVAL_MS; e.hasLos = ctx.rooms.hasLineOfSight(e.x, e.y, t.sprite.x, t.sprite.y); }
     if (dx * dx + dy * dy > LOVE_RULES.followDist * LOVE_RULES.followDist) m.steer(e, t, Math.max(60, e.spd) * 0.9, ctx.rooms);
     else e.setVelocity(0, 0);
     return true;
