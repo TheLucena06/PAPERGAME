@@ -181,6 +181,23 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 - v3c.2: playtest balance (Hurricane, mimic, early swords, Wave/worms, money ×0.8). See CONTENT.md.
 - Phase 3c (mobile): BUILT. Touch controls, layout editor, magnifier, PWA files, HOSTING.md. Next: Phase 4.
 
+## v3.3 tech: Castle path (js/castletown.js)
+- A stage can have its own `steps` (STAGE_TYPES.castle.steps = ['level','level','boss']) and `levels`
+  (['town','prison']: STAGE_TYPES entries with `subLevelOf: 'castle'`). Use `this.runSteps()` instead of RUN_PLAN.steps,
+  and `this.stage()` returns the CURRENT level's entry (runStep calls applyStage every step). `this.run.stageId` stays 'castle'.
+  `runStageIndex(id)` / `runStageParent(id)` find where 'town' / 'prison' live (debug start section, Test Dungeon).
+- Levels per stage are still counted from RUN_PLAN.steps (2): the castle also has 2 levels, keep it that way or fix startRun.
+- TownGen.assign (after LevelGenerator) gives normal/start/exit rooms a 20×13 layout (`room.townTiles` = block texture per
+  interior tile, `room.prisonCells` for the floor) and picks the brawl room (`room.brawl`). townRoom() re-textures blocks.
+- Lanes: the street through the side doors (tile rows mr-2..mr+1 interior) and through the up/down doors (mc±2) are kept
+  clear; carts only run on a lane that is fully clear (setupCartLanes). Carts are drawn on `cartG` at depth −1 so they slide
+  out from under the walls.
+- Brawls reuse the survival arena code: `this.arena = {kind:'survival', cfg: BRAWL_TYPES.x, label}`; updateArena reads
+  `a.cfg`; checkRoomState skips any survival timer; onRoomCleared → brawlReward (arenaReward).
+- Shoves: `p.shoveMs/shoveX/shoveY/shoveSpeed/shoveWall` add to `p.pullX/pullY` in updateTown; a wall ahead with
+  shoveWall > 0 = "Slammed!" (dotHit). Restrain: `p.restrainN/restrainMs` (slow via p.extraSlow, damage via a takeHit wrapper).
+- buildWave wrapper: `stage.boost` (swap picks to prisoners/bombers) and `stage.squads` (guard squads).
+
 ## Phase 3c tech (mobile)
 - js/mobile.js (after controls.js): IS_TOUCH (pointer: coarse + touch points, or ?touch), CONTROL_TYPES.touch
   (solo only; default on touch devices; Controls.allowed / fix / make wrapped), TOUCH_LAYOUT_DEFAULT

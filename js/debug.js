@@ -18,7 +18,11 @@ const CLASS_LABELS = { melee: 'Melee', precision: 'Precision', arcane: 'Arcane',
 // Every stage in run order, e.g. [{id:'notebook', idx:0}, {id:'sewer', idx:1}, {id:'castle', idx:1}, {id:'necrotery', idx:2}]
 function debugSections() {
   const out = [];
-  for (let i = 0; i < RUN_PLAN.stages.length; i++) for (let k = 0; k < RUN_PLAN.stages[i].length; k++) out.push({ id: RUN_PLAN.stages[i][k], idx: i });
+  for (let i = 0; i < RUN_PLAN.stages.length; i++) for (let k = 0; k < RUN_PLAN.stages[i].length; k++) {
+    const id = RUN_PLAN.stages[i][k], lv = STAGE_TYPES[id].levels;
+    if (lv) for (let j = 0; j < lv.length; j++) out.push({ id: lv[j], idx: i, sub: j });   // Castle: Market Town, The Prison
+    else out.push({ id: id, idx: i });
+  }
   return out;
 }
 
@@ -97,7 +101,7 @@ class DebugMenu {
       d.startSection = ids[(ids.indexOf(d.startSection || null) + 1) % ids.length];
       if (d.startSection) {                       // jump Start level to that section's first level
         const lps = RUN_PLAN.steps.filter((s) => s === 'level').length, sec = secs.find((s) => s.id === d.startSection);
-        d.startLevel = sec.idx * lps + 1;
+        d.startLevel = sec.idx * lps + 1 + (sec.sub || 0);
       }
       this.build();
     }, '#4a148c');
@@ -364,7 +368,7 @@ class TestPanel {
     const lps = RUN_PLAN.steps.filter((q) => q === 'level').length;
     this.clear();
     s.applyStage();
-    this.setLevel(sec.idx * lps + 1);
+    this.setLevel(sec.idx * lps + 1 + (sec.sub || 0));
     s.startTestRoom();
     GAME_CONFIG.debug.testSection = id;            // remembered for the next Test Dungeon
     this.build();

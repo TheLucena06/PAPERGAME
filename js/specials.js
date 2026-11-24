@@ -96,10 +96,10 @@ const RunRoomsMixin = {
     this.merchantHere = null;
     const m = this.merchantData();
     if (!m) return;
-    const step = this.run.step, kind = RUN_PLAN.steps[step];
+    const steps = this.runSteps(), step = this.run.step, kind = steps[step];
     if (kind === 'boss') return;
     let lastPre = 0;
-    for (let i = 0; i < RUN_PLAN.steps.length; i++) if (RUN_PLAN.steps[i] !== 'boss') lastPre = i;
+    for (let i = 0; i < steps.length; i++) if (steps[i] !== 'boss') lastPre = i;
     if (m.state === 'ordered' && m.step === step - 1) { this.merchantHere = 'deliver'; return; }
     if (m.state !== 'unseen' || step >= lastPre) return;
     const ch = SPECIAL_ROOMS.merchantChance[Math.min(step, SPECIAL_ROOMS.merchantChance.length - 1)];
@@ -331,12 +331,12 @@ const RunRoomsMixin = {
     if (a.kind !== 'survival' || this.room.cleared) return;
     a.msLeft -= dt;
     const sec = Math.ceil(Math.max(0, a.msLeft) / 1000);
-    const name = 'Hold out!  ' + Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
+    const name = (a.label || 'Hold out!') + '  ' + Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
     if (this.barAdapter.def.name !== name) this.barAdapter.def.name = name;
     if (a.msLeft <= 0) { this.endSurvival(); return; }
     a.spawnMs -= dt;
     if (a.spawnMs > 0) return;
-    const A = ARENA_TYPES.survival;
+    const A = a.cfg || ARENA_TYPES.survival;      // brawl rooms bring their own numbers (castletown.js)
     a.spawnMs = A.spawnEveryMs * (this.players.length > 1 ? 0.75 : 1);
     if (this.enemies.countActive() >= A.maxAlive * (this.players.length > 1 ? 1.4 : 1)) return;
     a.wave++;

@@ -20,6 +20,32 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## Castle path rebuilt: Market Town → Prison → Warden (v3.3) – js/castletown.js
+- Stage 2 "The Paper Castle" now has its OWN steps: Market Town level → Prison level → quick shop → Warden.
+  No arena on this path (each level has a brawl room instead). The Sewer path is unchanged (level, arena, level, boss).
+- Both levels have +2 rooms, and their normal/start/exit rooms are 20×13 tiles (they scroll).
+- MARKET TOWN: cobblestone streets, booths (3 awning colours), wells, crates, barrels, banners, lanterns, bunting.
+  Enemies: Shield Guard, Bomber, Warlock, Pyre Warlock, Charger, Tank, Gnome. Last-room themes: Market Riot (new), Siege, Pyre Ritual.
+  - SHOP CARTS roll along the street lanes (through the side doors, and the up/down doors), every 4.5–7.5 s, max 2 at once,
+    165–205 px/s. Red arrows blink 1 s where a cart will come in. A cart blocks every shot (yours and theirs).
+    Players it runs over are shoved aside and take 6 (× the level's enemy damage × 0.8, min ×1) – once per 0.8 s;
+    enemies take 22 and get knocked back (bosses / mini-bosses ignore carts). They stop once the exit gate opens.
+  - The level's exit hatch is the PRISON GATE.
+- THE PRISON: flagstones, cell blocks along the top and bottom walls (every cell door is broken open), torches, chains.
+  Enemies: Prisoners, Bomber, Shield Guard, Mace Guard (new), Brigade Guard (new), Warlock, Gnome.
+  30% of other picks become Prisoners or Bombers. Guard squads: a Brigade Guard brings a Shield Guard (75%),
+  a Shield Guard brings a Brigade Guard (40%) – at most 2 extra per room. Themes: Prison Break, Riot Squad (new), Siege.
+- MACE GUARD: 130 HP, speed 72, cost 4. Overhead smash: 22 dmg, radius 68, 58 px in front, 0.72 s windup (red circle,
+  stops aiming 0.22 s before it lands), recover 0.85 s, cooldown 1.5 s. Contact 10.
+- BRIGADE GUARD: 70 HP, speed 128, cost 3. Shield (100° front, takes 30%). Shield charge 12 (contact 8), quicker than the
+  Shield Guard (0.32 s windup, 500 px/s). Every hit shoves you (330 px/s for 0.26 s); hitting a wall while shoved: +14.
+  Every hit RESTRAINS you (max 3 stacks, 4 s): −12% speed and +10% damage taken per stack.
+- BRAWLS (one per level, a 24×15 room away from the start): a timed fight like the old survival arena.
+  Market Brawl 35 s (spawn every 2.2 s, max 10 alive, carts every 2.6–4.2 s, up to 3), Prison Brawl 40 s (every 2.0 s,
+  max 11 alive). Reward = the arena reward: coins (20 + 4×level) + a reward chest + arena shavings.
+- THE WARDEN: new look, "The Jailer" (owner's pick): plate barrel armor, spiked pauldrons, bucket helm, giant key ring;
+  the ball is now a spiked ball on a chain. Same fight and numbers. The boss arena has the prison look.
+
 ## Run structure (Phase 1) – js/stages.js
 - RUN_PLAN: stage 1 = notebook, then path choice: sewer OR castle. Steps per stage: level, arena, level, boss.
   Run is won after the stage-2 boss (more stages in Phase 6). Debug startLevel maps 2 levels per stage.
