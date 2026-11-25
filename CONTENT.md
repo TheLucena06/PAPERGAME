@@ -28,7 +28,8 @@
 - Gargoyles: right before each swoop they hover (35% speed) with flaring red eyes for ~0.2 s: raise a shield then to
   parry. A melee dash-attack that hits a gargoyle bashes it: stun 1.2 s.
 - ARROW VOLLEY (★★★ Archer skill, 150 coins, 70 mana, 9 s): a RECTANGLE of arrows flies where you aim: 5 side by side
-  (about 4 player bodies wide, 104 px) × 3 rows deep (30 px apart), all parallel, pierce 3.
+  (about 4 player bodies wide, 104 px) × 3 rows deep (30 px apart), pierce 3. Messy on purpose: each arrow is up to
+  17 px ahead/behind, 5 px to the side, ±1.5° and ±6% speed, like many archers shooting at once.
   Each = 40% of the held bow's full shot (min 30). Copies the bow, smaller: Composite +1 row, Mana Bow every 3rd
   arrow pops (half radius), Dorsal Bow half homing, Cupid's Bow 35% love, extra pierce from the bow.
   No bow / crossbow in hand: 11 damage per arrow. (v3.4.1: was a 64° fan.)

@@ -21,7 +21,7 @@ SKILL_TYPES.arrowVolley = {
   name: 'Arrow Volley', short: 'VOLY', kind: 'arrowVolley', class: 'precision', sub: 'Archer', price: 150, postBoss: POST_BOSS_2,
   desc: 'A block of 15 arrows flies where you aim:\n5 wide (4 of you) x 3 deep, all parallel.\nEach: 40% of your bow\'s full shot (min 30),\npierce 3. Copies your bow\'s effect,\nsmaller. No bow held: only 35% damage.',
   manaCost: 70, cooldownMs: 9000,
-  lanes: 5, rows: 3, widthBodies: 4, rowGap: 30, bowMul: 0.4, minDamage: 30, noBowMul: 0.35, pierce: 3,
+  lanes: 5, rows: 3, widthBodies: 4, rowGap: 30, jitterBack: 34, jitterSide: 10, jitterDeg: 3, jitterSpeed: 0.12, bowMul: 0.4, minDamage: 30, noBowMul: 0.35, pierce: 3,
   speed: 940, lifetimeMs: 950
 };
 
@@ -63,12 +63,15 @@ SKILL_BEHAVIORS.arrowVolley = function (p, d, ctx) {
   const width = p.stats.size * d.widthBodies, R = ctx.scene ? ctx.scene.rooms : null;
   let k = 0;
   for (let row = 0; row < rows; row++) for (let lane = 0; lane < d.lanes; lane++, k++) {
-    const side = (lane / (d.lanes - 1) - 0.5) * width, back = row * d.rowGap;
+    // messy, like many archers loosing at once: each arrow a bit ahead / behind, a bit to the side, slightly off-angle
+    const side = (lane / (d.lanes - 1) - 0.5) * width + (Math.random() - 0.5) * d.jitterSide;
+    const back = Math.max(0, row * d.rowGap + (Math.random() - 0.5) * d.jitterBack);
     let x = p.sprite.x + nx * side - ax * back + ax * p.stats.size * 0.7, y = p.sprite.y + ny * side - ay * back + ay * p.stats.size * 0.7;
     if (R && R.solidAt(x, y)) { x = p.sprite.x - ax * back; y = p.sprite.y - ay * back; }
     const b = WeaponSystem.fireArrow(p, ctx, ax, ay, d.speed, dmg, d.lifetimeMs + back * 1000 / d.speed, tex, pierce, homing, null, true);
     if (!b) continue;
-    b.setPosition(x, y); b.body.reset(x, y); b.body.setVelocity(ax * d.speed, ay * d.speed);
+    const ang = base + (Math.random() - 0.5) * d.jitterDeg * Math.PI / 180, spd = d.speed * (1 + (Math.random() - 0.5) * d.jitterSpeed);
+    b.setPosition(x, y); b.body.reset(x, y); b.body.setVelocity(Math.cos(ang) * spd, Math.sin(ang) * spd); b.setRotation(ang);
     b.love = love;
     if (mana && k % 3 === 1) b.aoeRadius = Math.round(mana.radius * 0.5);
   }
