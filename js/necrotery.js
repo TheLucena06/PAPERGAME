@@ -27,12 +27,12 @@ Object.assign(THEMED_ROOMS, {
 /* ---------------- enemies ---------------- */
 const SKEL_BASE = { minLevel: 1, postBoss: 2, speedVariance: 0.1, mass: 1.2, hitKnockback: 120, hitKnockbackMs: 60, contactPushback: 180, contactPushbackMs: 150 };
 const DARK = { revives: [1, 2], reviveMs: 2600, reviveHpPct: 0.6, eyeColor: 0xb388ff, dark: true };
-const SKEL_SWORD = { ai: 'skelSword', size: 24, maxHp: 46, speed: 120, contactDamage: 6, coins: [2, 3],
+const SKEL_SWORD = { ai: 'skelSword', size: 24, maxHp: 46, speed: 145, contactDamage: 6, coins: [2, 3],
   attackRange: 74, windupMs: 420, lockMs: 140, slash: { range: 80, arcDeg: 110, damage: 15 }, recoverMs: 520, attackCooldownMs: 1200, eyeColor: 0xff5252 };
 const SKEL_ARCHER = { ai: 'skelArcher', size: 22, maxHp: 34, speed: 95, contactDamage: 4, coins: [2, 3],
   preferredMin: 220, preferredMax: 380, windupMs: 680, lockMs: 220, recoverMs: 420, attackCooldownMs: 1900,
   arrow: { speed: 430, damage: 13, lifetimeMs: 1800 }, eyeColor: 0xff8a65 };
-const SKEL_GUARD = { ai: 'skelGuard', size: 28, maxHp: 95, speed: 85, contactDamage: 9, dashDamage: 17, coins: [3, 4], mass: 4,
+const SKEL_GUARD = { ai: 'skelGuard', size: 28, maxHp: 95, speed: 100, contactDamage: 9, dashDamage: 17, coins: [3, 4], mass: 4,
   hitKnockback: 50, hitKnockbackMs: 40, contactPushback: 200, contactPushbackMs: 160,
   shield: { arcDeg: 120, blockMul: 0.15 }, turnSpeed: 2.4, attackRange: 150, windupMs: 520, dashSpeed: 460, dashMs: 300, recoverMs: 700, attackCooldownMs: 1700, eyeColor: 0xffd54f };
 
@@ -40,7 +40,7 @@ Object.assign(ENEMY_TYPES, {
   skeleton:          Object.assign({}, SKEL_BASE, SKEL_SWORD, { name: 'Skeleton', cost: 2, weight: 3, color: 0xe0dccf }),
   skeletonArcher:    Object.assign({}, SKEL_BASE, SKEL_ARCHER, { name: 'Skeleton Archer', cost: 2, weight: 2, color: 0xe0dccf }),
   skeletonGuard:     Object.assign({}, SKEL_BASE, SKEL_GUARD, { name: 'Skeleton Guard', cost: 3, weight: 1.6, color: 0xe0dccf }),
-  darkSkeleton:      Object.assign({}, SKEL_BASE, SKEL_SWORD, DARK, { name: 'Dark Skeleton', cost: 3, weight: 2, color: 0x7e6bc4, speed: 130 }),
+  darkSkeleton:      Object.assign({}, SKEL_BASE, SKEL_SWORD, DARK, { name: 'Dark Skeleton', cost: 3, weight: 2, color: 0x7e6bc4, speed: 155 }),
   darkSkeletonArcher:Object.assign({}, SKEL_BASE, SKEL_ARCHER, DARK, { name: 'Dark Skeleton Archer', cost: 3, weight: 1.4, color: 0x7e6bc4 }),
   darkSkeletonGuard: Object.assign({}, SKEL_BASE, SKEL_GUARD, DARK, { name: 'Dark Skeleton Guard', cost: 4, weight: 1, color: 0x7e6bc4 }),
   necroMage: {

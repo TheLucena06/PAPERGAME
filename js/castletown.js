@@ -71,7 +71,7 @@ const TOWN_RULES = {
   largeCols: 20, largeRows: 13, largeChance: 0.25,   // ...25% are bigger than the screen (they scroll)
   cart: { everyMs: [4500, 7500], warnMs: 1000, speed: [165, 205], max: 2, len: 104, wide: 58,
           playerDamage: 6, enemyDamage: 22, hitCdMs: 800, shoveSpeed: 260, shoveMs: 200 },
-  restrain: { ms: 4000, maxStacks: 3, slowPer: 0.12, defPer: 0.1 }   // Brigade Guard: per stack
+  restrain: { ms: 5000, maxStacks: 3, slowPer: 0.18, defPer: 0.15 }  // Brigade Guard: per stack (v3.4: was 12% / 10% / 4 s)
 };
 
 /* ---------------- enemies ---------------- */
@@ -80,7 +80,7 @@ Object.assign(ENEMY_TYPES, {
   maceGuard: {
     name: 'Mace Guard', ai: 'maceGuard',
     cost: 4, minLevel: 1, postBoss: 1, weight: 2, coins: [4, 5],
-    maxHp: 130, speed: 72, speedVariance: 0.05, size: 30, color: 0x455a64, mass: 6,
+    maxHp: 130, speed: 88, speedVariance: 0.05, size: 30, color: 0x455a64, mass: 6,
     contactDamage: 10,
     hitKnockback: 40, hitKnockbackMs: 30, contactPushback: 220, contactPushbackMs: 160,
     smash: { range: 125, reach: 58, radius: 68, damage: 22, windupMs: 720, lockMs: 220 },
@@ -323,7 +323,7 @@ const TownTextures = {
       { id: 'brigadeGuard', enemy: 'brigadeGuard', tag: 'The Prison',
         desc: 'Trained to hold back prisoners. Comes with other guards.',
         abilities: (d) => ['Fast shield charge (' + d.dashDamage + ') that shoves you. Into a wall: +' + d.brigade.wallDamage + '.',
-                           'Every hit restrains you (up to 3x): -12% speed and +10% damage taken each, 4 s.'] });
+                           'Every hit restrains you (up to 3x): -' + Math.round(TOWN_RULES.restrain.slowPer * 100) + '% speed and +' + Math.round(TOWN_RULES.restrain.defPer * 100) + '% damage taken each, ' + TOWN_RULES.restrain.ms / 1000 + ' s.'] });
   }
 })();
 

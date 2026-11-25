@@ -20,6 +20,23 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## v3.4 – Arrow Volley, Brigade Armor, Buckler rework, faster enemies – js/knightgear.js
+- Recurve Bow: Test Dungeon only now (owner: few use cases). Its blueprint is gone.
+- ENEMIES +10% speed (every enemy except bosses and the Gnome). On top of that: Skeleton 120→145, Dark Skeleton
+  130→155, Skeleton Guard / Dark Skeleton Guard 85→100, Mace Guard 72→88 (all before the +10%).
+- Restrained (Brigade Guard) is stronger: per stack −18% speed (was 12%) and +15% damage taken (was 10%), 5 s (was 4).
+- Gargoyles: right before each swoop they hover (35% speed) with flaring red eyes for ~0.2 s: raise a shield then to
+  parry. A melee dash-attack that hits a gargoyle bashes it: stun 1.2 s.
+- ARROW VOLLEY (★★★ Archer skill, 150 coins, 70 mana, 9 s): 15 arrows in a 64° fan where you aim, pierce 3.
+  Each = 40% of the held bow's full shot (min 30). Copies the bow, smaller: Composite +4 arrows, Mana Bow every 3rd
+  arrow pops (half radius), Dorsal Bow half homing, Cupid's Bow 35% love, extra pierce from the bow.
+  No bow / crossbow in hand: 11 damage per arrow.
+- BRIGADE ARMOR (★★★ Knight armor, 140 coins): +25 max HP, defense 26%. Your hits: 15% chance to RESTRAIN the enemy
+  for 4 s (stacks 3×): −15% speed and +10% damage taken per stack. Chain links show over restrained enemies.
+- BUCKLER (Knight shield) rework: raising it gives a 15 HP guard that soaks hits first (bar under you). Broken: back
+  after 4 s; otherwise regenerates 6/s after 1.5 s without being hit. Dash INTO an enemy attack while holding it up:
+  80% of that damage goes back to the attacker + knockback + stun 0.9 s.
+
 ## v3.3.1 fixes
 - Market Town / Prison rooms: mostly regular size again (15×10); 25% are bigger (20×13); brawl rooms stay 24×15.
   Levels keep their +2 rooms.

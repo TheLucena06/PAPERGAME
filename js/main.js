@@ -515,7 +515,8 @@ class GameScene extends Phaser.Scene {
     this.setupCupid();                           // Lovestruck, Cupid's Flight trails (cupid.js)
     this.setupMiner();                           // Mine Train, coal smudges (miner.js)
     this.setupGrave();                           // sections: the Necrotery graveyard (graveyard.js)
-    this.setupTown();                            // Castle path: market town carts, prison guards (castletown.js)
+    this.setupTown();
+    this.setupKnight();                          // Buckler guard, Brigade restrain, gargoyle tells (knightgear.js)                            // Castle path: market town carts, prison guards (castletown.js)
     this.setupHunter();                          // traps, hawks, marks (hunter.js)                         // potions on the floor (pickups.js)                            // darkness, torches, burning floors, the Dead Titan (lighting.js, necrotery.js, titan.js)
     this.zones = new ZoneManager(this);          // lasting spell areas (Hurricane, Fire Pillar, storms...)
     // Save data: bestiary pages + kit unlocks (not in the Test Dungeon)
@@ -1292,6 +1293,7 @@ class GameScene extends Phaser.Scene {
     this.updateRussi(dt);
     this.updateGrave(dt);
     this.updateTown(dt);
+    this.updateKnight(dt);
     this.lighting.update(dt);
     this.hud.drawBoss(dt);
     this.hud.updatePanel(this.players, this.team, this.level, this.elapsedMs);
@@ -1367,6 +1369,7 @@ class GameScene extends Phaser.Scene {
     if (owner && owner.stats && owner.stats.bossDamage > 0 && GearFx.isBoss(e)) dmg = Math.round(dmg * (1 + owner.stats.bossDamage));
     if (e.hexUntil > this.time.now) dmg = Math.round(dmg * 1.25);              // Witch hex: +25% from everything
     if (owner && owner.stats && owner.stats.hexChance > 0 && source !== 'dot' && Math.random() < owner.stats.hexChance) GearFx.hex(this.enemies, e, { ms: 3000 }, owner);
+    dmg = this.knightOnHit(e, dmg, owner, source);                         // Brigade Armor restrain, gargoyle bash (knightgear.js)
     if (owner && owner.stats && owner.stats.lifeSteal > 0 && owner.alive && source !== 'dot') {
       owner.lifeStealAcc = (owner.lifeStealAcc || 0) + dmg * owner.stats.lifeSteal;   // whole HP points only
       if (owner.lifeStealAcc >= 1) { const h = Math.floor(owner.lifeStealAcc); owner.lifeStealAcc -= h; owner.hp = Math.min(owner.stats.maxHp, owner.hp + h); }
@@ -1429,6 +1432,7 @@ class GameScene extends Phaser.Scene {
 
   // After an enemy attack reached a player (not parried).
   onPlayerHit(p, res, attacker) {
+    this.knightHitCheck(p, res, attacker);            // Buckler: dash into an attack = reflect (res is 'none' then)
     if (res === 'none' || res === 'parry') return;
     this.ribTrapCheck(p, res, attacker);              // Titan Ribcage armor
     this.thornsCheck(p, res, attacker);               // Thorn Armor
@@ -1673,7 +1677,7 @@ class GameScene extends Phaser.Scene {
 
 /* ---------- Game Over ---------- */
 // merchant / treasure / shrine / themed rooms / arena / enemy bosses (specials.js)
-Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, RussiMixin, GraveMixin, TownMixin);
+Object.assign(GameScene.prototype, RunRoomsMixin, NecroMixin, TitanMixin, PickupMixin, HunterMixin, BoulderMixin, BerserkerMixin, CupidMixin, MinerMixin, RussiMixin, GraveMixin, TownMixin, KnightMixin);
 
 class GameOverScene extends Phaser.Scene {
   constructor() { super('GameOverScene'); }
