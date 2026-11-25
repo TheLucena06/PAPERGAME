@@ -181,6 +181,14 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 - v3c.2: playtest balance (Hurricane, mimic, early swords, Wave/worms, money ×0.8). See CONTENT.md.
 - Phase 3c (mobile): BUILT. Touch controls, layout editor, magnifier, PWA files, HOSTING.md. Next: Phase 4.
 
+## v3.4 tech (js/knightgear.js)
+- KnightMixin: knightOnHit(e, dmg, owner, source) is called in hitEnemy (restrained = more damage; restrainChance
+  procs; gargoyle bash). knightHitCheck runs at the TOP of onPlayerHit (before the 'none' early return): the Knight Shield
+  reflect is recorded in Player.takeHit (wrapper) as p.shieldReflect while dashing with attack held.
+- Knight Shield guard rides on p.barrierHp inside takeHit (added before, taken back after). p.guardHp / guardCdMs / guardIdleMs.
+- ENEMY_SPEED_MUL (enemies.js) multiplies every spawned enemy's speed except bosses, boss parts and the gnome.
+- Gargoyle AI sets e.gTell during the end of its cruise phase (tellFrac).
+
 ## v3.3 tech: Castle path (js/castletown.js)
 - A stage can have its own `steps` (STAGE_TYPES.castle.steps = ['level','level','boss']) and `levels`
   (['town','prison']: STAGE_TYPES entries with `subLevelOf: 'castle'`). Use `this.runSteps()` instead of RUN_PLAN.steps,

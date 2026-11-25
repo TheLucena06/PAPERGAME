@@ -38,7 +38,7 @@ Object.assign(ENEMY_TYPES, {
     cost: 3, minLevel: 1, postBoss: 2, weight: 0, coins: [2, 3],          // weight 0: graveyard fights + the Demonic Gargoyle bring them
     maxHp: 40, speed: 150, speedVariance: 0.1, size: 24, color: 0x78909c, mass: 1,
     contactDamage: 7, dashDamage: 11, hitKnockback: 140, hitKnockbackMs: 70, contactPushback: 220, contactPushbackMs: 150,
-    burstSpeed: 440, cycleMs: 760, burstFrac: 0.42, turnBurst: 2.6, turnCruise: 6,
+    burstSpeed: 440, cycleMs: 760, burstFrac: 0.42, tellFrac: 0.28, turnBurst: 2.6, turnCruise: 6,
     hexOnHit: { ms: 4000 }, eyeColor: 0xff1744
   },
   demonGargoyle: {
@@ -69,6 +69,7 @@ Object.assign(ENEMY_AI, {
     const d = e.def;
     e.gT = (e.gT === undefined ? Math.random() * d.cycleMs : e.gT) + dt;
     const ph = (e.gT % d.cycleMs) / d.cycleMs, burst = ph < d.burstFrac;
+    e.gTell = !burst && ph > 1 - d.tellFrac;                                      // about to swoop: hovers, eyes flare (knightgear.js draws it)
     const want = Math.atan2(e.tdy, e.tdx);
     if (e.gAng === undefined) e.gAng = want;
     if (burst && !e.gBurst) e.gAng = want + (Math.random() - 0.5) * 0.8;      // each surge swoops in from a slightly different angle
@@ -78,7 +79,7 @@ Object.assign(ENEMY_AI, {
     while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
     const turn = (burst ? d.turnBurst : d.turnCruise) * dt / 1000;
     e.gAng += Math.max(-turn, Math.min(turn, da));
-    const sp = burst ? d.burstSpeed * (e.spd / d.speed) : e.spd;
+    const sp = burst ? d.burstSpeed * (e.spd / d.speed) : e.spd * (e.gTell ? 0.35 : 1);
     e.setVelocity(Math.cos(e.gAng) * sp, Math.sin(e.gAng) * sp);
     e.state = burst ? 'dash' : 'move';                                            // dash = contact hits harder
   },

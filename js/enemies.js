@@ -15,6 +15,7 @@
      bleedMs          "Injured": takes bleed damage every 500 ms
      markMs/markedBy  marked by a player's Crippling Crossbow
      wallStunMs       if it gets knocked into a wall during this time, it is stunned */
+const ENEMY_SPEED_MUL = 1.10;   // owner: enemies were too easy to dodge
 
 const ENEMY_TYPES = {
   runner: {
@@ -654,7 +655,8 @@ class EnemyManager {
     e.maxHp = Math.round(def.maxHp * this.hpMul);
     e.hp = e.maxHp;
     e.dmgMul = this.dmgMul;
-    e.speed = def.speed * (1 + (Math.random() * 2 - 1) * def.speedVariance);
+    e.speed = def.speed * (1 + (Math.random() * 2 - 1) * def.speedVariance)
+      * ((def.boss || def.bossPart || typeId === 'gnome') ? 1 : ENEMY_SPEED_MUL);   // v3.4: every enemy +10% (not bosses, not the gnome)
     e.spd = e.speed;
     e.state = 'move';
     e.stateMs = 0;
