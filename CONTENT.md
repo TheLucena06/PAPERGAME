@@ -27,10 +27,12 @@
 - Restrained (Brigade Guard) is stronger: per stack −18% speed (was 12%) and +15% damage taken (was 10%), 5 s (was 4).
 - Gargoyles: right before each swoop they hover (35% speed) with flaring red eyes for ~0.2 s: raise a shield then to
   parry. A melee dash-attack that hits a gargoyle bashes it: stun 1.2 s.
-- ARROW VOLLEY (★★★ Archer skill, 150 coins, 70 mana, 9 s): 15 arrows in a 64° fan where you aim, pierce 3.
-  Each = 40% of the held bow's full shot (min 30). Copies the bow, smaller: Composite +4 arrows, Mana Bow every 3rd
+- ARROW VOLLEY (★★★ Archer skill, 150 coins, 70 mana, 9 s): a RECTANGLE of arrows flies where you aim: 5 side by side
+  (about 4 player bodies wide, 104 px) × 3 rows deep (30 px apart), pierce 3. Messy on purpose: each arrow is up to
+  17 px ahead/behind, 5 px to the side, ±1.5° and ±6% speed, like many archers shooting at once.
+  Each = 40% of the held bow's full shot (min 30). Copies the bow, smaller: Composite +1 row, Mana Bow every 3rd
   arrow pops (half radius), Dorsal Bow half homing, Cupid's Bow 35% love, extra pierce from the bow.
-  No bow / crossbow in hand: 11 damage per arrow.
+  No bow / crossbow in hand: 11 damage per arrow. (v3.4.1: was a 64° fan.)
 - BRIGADE ARMOR (★★★ Knight armor, 140 coins): +25 max HP, defense 26%. Your hits: 15% chance to RESTRAIN the enemy
   for 4 s (stacks 3×): −15% speed and +10% damage taken per stack. Chain links show over restrained enemies.
 - KNIGHT SHIELD (new ★★ Knight shield, 90 coins; the Buckler is unchanged): blocks 45% from the front (170°), parry
