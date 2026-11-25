@@ -19,10 +19,10 @@ Object.assign(STAT_DEFAULTS, { restrainChance: 0 });
 /* ---------------- items ---------------- */
 SKILL_TYPES.arrowVolley = {
   name: 'Arrow Volley', short: 'VOLY', kind: 'arrowVolley', class: 'precision', sub: 'Archer', price: 150, postBoss: POST_BOSS_2,
-  desc: 'A wide volley of 15 arrows where you aim\n(40% of your bow\'s full shot each, min 30;\npierce 3). Copies your bow\'s effect,\nsmaller. No bow held: only 35% damage.',
+  desc: 'A block of 15 arrows flies where you aim:\n5 wide (4 of you) x 3 deep, all parallel.\nEach: 40% of your bow\'s full shot (min 30),\npierce 3. Copies your bow\'s effect,\nsmaller. No bow held: only 35% damage.',
   manaCost: 70, cooldownMs: 9000,
-  count: 15, spreadDeg: 64, bowMul: 0.4, minDamage: 30, noBowMul: 0.35, pierce: 3,
-  speed: [820, 1000], lifetimeMs: 950
+  lanes: 5, rows: 3, widthBodies: 4, rowGap: 30, bowMul: 0.4, minDamage: 30, noBowMul: 0.35, pierce: 3,
+  speed: 940, lifetimeMs: 950
 };
 
 ARMOR_TYPES.brigadeArmor = {
@@ -54,18 +54,23 @@ SKILL_BEHAVIORS.arrowVolley = function (p, d, ctx) {
   dmg = Math.round(dmg * p.stats.damageMul);
   const homing = bow && wd.homing ? wd.homing * 0.5 : 0;
   const pierce = d.pierce + (bow && wd.pierceCount ? Math.floor(wd.pierceCount / 3) : 0) + (bow && wd.pierce ? wd.pierce : 0);
-  const count = d.count + (bow && wd.fullFan ? 4 : 0);                     // Composite Bow: a wider volley
+  const rows = d.rows + (bow && wd.fullFan ? 1 : 0);                      // Composite Bow: one more row
   const mana = bow && wd.manaArrow ? wd.manaArrow : null;                  // Mana Bow: every 3rd arrow pops (small)
   const love = bow && wd.love ? { charge: (wd.love.charge || 0.3) * 0.35, chance: wd.love.chance ? wd.love.chance * 0.35 : 0 } : null;
   const tex = bow ? (wd.texture || 'arrow') : 'arrow';
-  const base = Math.atan2(p.input.aimY, p.input.aimX), step = d.spreadDeg / (count - 1) * Math.PI / 180;
-  for (let i = 0; i < count; i++) {
-    const a = base - (d.spreadDeg / 2) * Math.PI / 180 + i * step + (Math.random() - 0.5) * 0.03;
-    const spd = d.speed[0] + Math.random() * (d.speed[1] - d.speed[0]);
-    const b = WeaponSystem.fireArrow(p, ctx, Math.cos(a), Math.sin(a), spd, dmg, d.lifetimeMs, tex, pierce, homing, null, true);
+  // a rectangle: lanes side by side (about 4 player bodies wide), rows one behind the other, all flying the same way
+  const ax = p.input.aimX, ay = p.input.aimY, base = Math.atan2(ay, ax), nx = -ay, ny = ax;
+  const width = p.stats.size * d.widthBodies, R = ctx.scene ? ctx.scene.rooms : null;
+  let k = 0;
+  for (let row = 0; row < rows; row++) for (let lane = 0; lane < d.lanes; lane++, k++) {
+    const side = (lane / (d.lanes - 1) - 0.5) * width, back = row * d.rowGap;
+    let x = p.sprite.x + nx * side - ax * back + ax * p.stats.size * 0.7, y = p.sprite.y + ny * side - ay * back + ay * p.stats.size * 0.7;
+    if (R && R.solidAt(x, y)) { x = p.sprite.x - ax * back; y = p.sprite.y - ay * back; }
+    const b = WeaponSystem.fireArrow(p, ctx, ax, ay, d.speed, dmg, d.lifetimeMs + back * 1000 / d.speed, tex, pierce, homing, null, true);
     if (!b) continue;
+    b.setPosition(x, y); b.body.reset(x, y); b.body.setVelocity(ax * d.speed, ay * d.speed);
     b.love = love;
-    if (mana && i % 3 === 1) b.aoeRadius = Math.round(mana.radius * 0.5);
+    if (mana && k % 3 === 1) b.aoeRadius = Math.round(mana.radius * 0.5);
   }
   if (ctx.fx) { ctx.fx(p.sprite.x + Math.cos(base) * 30, p.sprite.y + Math.sin(base) * 30, 34, bow ? 0xffb300 : 0x9e9e9e, 200); }
   if (ctx.shake) ctx.shake(70, 0.003);
