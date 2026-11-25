@@ -2,7 +2,7 @@
    - Arrow Volley ("Salva de flechas"): ★★★ Archer skill. A wide piercing volley where you aim. Copies the held bow's
      special effect at a smaller scale. Without a bow (or crossbow) it does much less damage.
    - Brigade Armor: ★★★ Knight armor. Your hits can RESTRAIN enemies (slower, take more damage; stacks).
-   - Buckler (Knight shield) rework: raising it gives a 15 HP guard that soaks hits. Broken = 4 s before it comes
+   - Knight Shield (new ★★, the Buckler is unchanged): raising it gives a 15 HP guard that soaks hits. Broken = 4 s before it comes
      back. Dash INTO an enemy attack while holding the shield up: most of the damage goes back to the attacker,
      with knockback and a short stun.
    - Gargoyles: they tense up (eyes flare, hover) right before each swoop, so the shield parry can be timed;
@@ -31,11 +31,15 @@ ARMOR_TYPES.brigadeArmor = {
   mods: { maxHp: 25, defense: 0.26, restrainChance: 0.15 }
 };
 
-Object.assign(WEAPON_TYPES.buckler, {
-  desc: 'Hold attack to raise: blocks 40% from\nthe front + a 15 HP guard that soaks hits\n(broken: back after 4 s). Raise right before\na hit to parry (stun 2 s). Dash INTO an\nattack with it up: 80% of the damage goes\nback, knockback + stun 0.9 s.',
+// Knight Shield: a new ★★ Knight shield (the Buckler stays as it was).
+WEAPON_TYPES.knightShield = {
+  name: 'Knight Shield', short: 'KSHD', kind: 'shield', class: 'melee', sub: 'Knight', type: 'shield', price: 90, postBoss: POST_BOSS_1,
+  desc: 'Hold attack to raise: blocks 45% from\nthe front + a 15 HP guard that soaks hits\n(broken: back after 4 s). Raise right before\na hit to parry (stun 1.8 s). Dash INTO an\nattack with it up: 80% of the damage goes\nback, knockback + stun 0.9 s.',
+  arcDeg: 170, blockPct: 0.45, parryWindowMs: 180, stunMs: 1800, parryDamage: 6, reraiseDelayMs: 380,
   guard: { hp: 15, breakCdMs: 4000, regenDelayMs: 1500, regenPerSec: 6 },
-  reflect: { pct: 0.8, knockback: 420, knockbackMs: 180, stunMs: 900 }
-});
+  reflect: { pct: 0.8, knockback: 420, knockbackMs: 180, stunMs: 900 },
+  visual: { style: 'shield', color: 0x1565c0 }
+};
 
 // Recurve Bow: owner's call, Test Dungeon only (few use cases).
 WEAPON_TYPES.recurveBow.debugOnly = true;
@@ -73,12 +77,12 @@ SKILL_BEHAVIORS.arrowVolley = function (p, d, ctx) {
   const takeHit = Player.prototype.takeHit;
   Player.prototype.takeHit = function (amount, srcX, srcY) {
     const w = this.weapon, d = w && w.def;
-    // dashing into an attack with the Buckler up: remember it; knightHitCheck sends it back to the attacker
+    // dashing into an attack with the Knight Shield up: remember it; knightHitCheck sends it back to the attacker
     if (d && d.reflect && this.alive && this.isDashing() && this.input && this.input.attack) {
       if (!this.shieldReflect || amount > this.shieldReflect.amount) this.shieldReflect = { amount: amount, x: srcX, y: srcY };
       return 'none';
     }
-    // Buckler raised: the guard soaks damage first (it rides on the barrier, which takeHit already uses)
+    // Knight Shield raised: the guard soaks damage first (it rides on the barrier, which takeHit already uses)
     if (d && d.guard && w.raised && this.guardHp > 0 && !(this.guardCdMs > 0)) {
       const b0 = this.barrierHp || 0, g = this.guardHp;
       this.barrierHp = b0 + g;
@@ -125,7 +129,7 @@ const KnightMixin = {
     return dmg;
   },
 
-  // From onPlayerHit: the Buckler dash reflect.
+  // From onPlayerHit: the Knight Shield dash reflect.
   knightHitCheck(p, res, attacker) {
     const r = p.shieldReflect;
     if (!r) return;
@@ -149,8 +153,8 @@ const KnightMixin = {
     for (let i = 0; i < this.players.length; i++) {
       const p = this.players[i], d = p.weapon && p.weapon.def;
       p.shieldReflect = null;                                   // a reflect only counts in the frame it happened
-      if (p.guardHp === undefined) p.guardHp = WEAPON_TYPES.buckler.guard.hp;
-      const G = WEAPON_TYPES.buckler.guard;
+      const G = WEAPON_TYPES.knightShield.guard;
+      if (p.guardHp === undefined) p.guardHp = G.hp;
       if (playing) {
         if (p.guardCdMs > 0) { p.guardCdMs -= dt; if (p.guardCdMs <= 0) { p.guardHp = G.hp; p.guardCdMs = 0; } }
         else if (p.guardHp < G.hp) {
@@ -158,7 +162,7 @@ const KnightMixin = {
           if (p.guardIdleMs > G.regenDelayMs) p.guardHp = Math.min(G.hp, p.guardHp + G.regenPerSec * dt / 1000);
         }
       }
-      // guard bar under the player while the Buckler is in hand
+      // guard bar under the player while the Knight Shield is in hand
       if (!p.alive || !d || !d.guard) continue;
       const x = p.sprite.x, y = p.sprite.y + p.stats.size / 2 + 8, w = 34;
       const k = p.guardCdMs > 0 ? 1 - p.guardCdMs / G.breakCdMs : p.guardHp / G.hp;

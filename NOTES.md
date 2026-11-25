@@ -183,9 +183,9 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 
 ## v3.4 tech (js/knightgear.js)
 - KnightMixin: knightOnHit(e, dmg, owner, source) is called in hitEnemy (restrained = more damage; restrainChance
-  procs; gargoyle bash). knightHitCheck runs at the TOP of onPlayerHit (before the 'none' early return): the Buckler
+  procs; gargoyle bash). knightHitCheck runs at the TOP of onPlayerHit (before the 'none' early return): the Knight Shield
   reflect is recorded in Player.takeHit (wrapper) as p.shieldReflect while dashing with attack held.
-- Buckler guard rides on p.barrierHp inside takeHit (added before, taken back after). p.guardHp / guardCdMs / guardIdleMs.
+- Knight Shield guard rides on p.barrierHp inside takeHit (added before, taken back after). p.guardHp / guardCdMs / guardIdleMs.
 - ENEMY_SPEED_MUL (enemies.js) multiplies every spawned enemy's speed except bosses, boss parts and the gnome.
 - Gargoyle AI sets e.gTell during the end of its cruise phase (tellFrac).
 
