@@ -181,6 +181,10 @@ Removed: Leather Vest, Volley (replaced by the new Precision items).
 - v3c.2: playtest balance (Hurricane, mimic, early swords, Wave/worms, money ×0.8). See CONTENT.md.
 - Phase 3c (mobile): BUILT. Touch controls, layout editor, magnifier, PWA files, HOSTING.md. Next: Phase 4.
 
+## v3.4.2 tech
+- STAGE_TYPES.x.difficulty = {hp, dmg, count}: EnemyManager.setLevel reads it from scene.stage() (stageHp/stageDmg,
+  applied in spawn except bosses / boss parts); startRoomFight multiplies budget + maxCount by count.
+
 ## v3.4 tech (js/knightgear.js)
 - KnightMixin: knightOnHit(e, dmg, owner, source) is called in hitEnemy (restrained = more damage; restrainChance
   procs; gargoyle bash). knightHitCheck runs at the TOP of onPlayerHit (before the 'none' early return): the Knight Shield
