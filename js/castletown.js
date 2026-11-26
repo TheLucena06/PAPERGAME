@@ -52,6 +52,8 @@ Object.assign(STAGE_TYPES, {
 STAGE_TYPES.castle.tagline = 'Market streets, then the prison and its Warden.';
 STAGE_TYPES.castle.steps = ['level', 'level', 'boss'];      // town -> prison -> (quick shop) -> Warden. No arena.
 STAGE_TYPES.castle.levels = ['town', 'prison'];
+STAGE_TYPES.town.difficulty = { hp: 1.15, dmg: 1.1 };      // same as the rest of stage 2 (stages.js)
+STAGE_TYPES.prison.difficulty = { hp: 1.15, dmg: 1.1 };
 
 Object.assign(THEMED_ROOMS, {
   marketRiot: { name: 'Market Riot', layout: 0, waves: [[['charger', 2], ['bomber', 2]], [['guard', 2], ['warlock', 2]], [['charger', 3], ['tank', 1]]] },

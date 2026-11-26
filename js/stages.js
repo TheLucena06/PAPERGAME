@@ -85,3 +85,9 @@ const SPECIAL_ROOMS = {
   merchant: { orderMul: 1.3 },   // orders cost 130% (paid now, delivered when you meet him again)
   chestCoins: [10, 18]
 };
+
+// Stage difficulty (owner OK'd, v3.4.2): stage enemies are tougher than the level scaling alone makes them.
+// hp / dmg multiply normal enemies (not bosses); count multiplies the room budget and max enemies per room.
+STAGE_TYPES.sewer.difficulty = { hp: 1.15, dmg: 1.1 };
+STAGE_TYPES.castle.difficulty = { hp: 1.15, dmg: 1.1 };
+

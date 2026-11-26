@@ -590,6 +590,9 @@ class EnemyManager {
     const dbg = GAME_CONFIG.debug;
     this.hpMul = (1 + (level - 1) * levelCfg.hpPerLevel) * (dbg.enemyHpPct || 100) / 100;
     this.dmgMul = (1 + (level - 1) * levelCfg.damagePerLevel) * (dbg.enemyDmgPct || 100) / 100;
+    // the stage's own difficulty (STAGE_TYPES.x.difficulty): tougher enemies deeper in the run (not bosses)
+    const st = this.scene && this.scene.stage ? this.scene.stage() : null, df = (st && st.difficulty) || {};
+    this.stageHp = df.hp || 1; this.stageDmg = df.dmg || 1;
   }
 
   canAppear(def, level) {
@@ -652,9 +655,10 @@ class EnemyManager {
     e.setAlpha(1);
     e.def = def;
     e.typeId = typeId;
-    e.maxHp = Math.round(def.maxHp * this.hpMul);
+    const big = def.boss || def.bossPart;
+    e.maxHp = Math.round(def.maxHp * this.hpMul * (big ? 1 : this.stageHp || 1));
     e.hp = e.maxHp;
-    e.dmgMul = this.dmgMul;
+    e.dmgMul = this.dmgMul * (big ? 1 : this.stageDmg || 1);
     e.speed = def.speed * (1 + (Math.random() * 2 - 1) * def.speedVariance)
       * ((def.boss || def.bossPart || typeId === 'gnome') ? 1 : ENEMY_SPEED_MUL);   // v3.4: every enemy +10% (not bosses, not the gnome)
     e.spd = e.speed;

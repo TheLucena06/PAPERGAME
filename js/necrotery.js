@@ -18,6 +18,7 @@ STAGE_TYPES.necrotery = {
   themes: ['boneyard', 'seance', 'crypt'],
   champions: ['darkSkeletonGuard', 'phantom', 'skeletonGuard']
 };
+STAGE_TYPES.necrotery.difficulty = { hp: 1.4, dmg: 1.3, count: 1.2 };   // owner OK'd (v3.4.2): it felt too easy
 Object.assign(THEMED_ROOMS, {
   boneyard: { name: 'Boneyard', layout: 1, waves: [[['skeleton', 4], ['skeletonArcher', 2]], [['darkSkeleton', 3], ['skeletonGuard', 2]]] },
   seance:   { name: 'Séance', layout: 0, waves: [[['wisp', 4], ['phantom', 1]], [['necroMage', 1], ['phantom', 2], ['wisp', 2]]] },
@@ -50,9 +51,9 @@ Object.assign(ENEMY_TYPES, {
     contactDamage: 6, hitKnockback: 100, hitKnockbackMs: 60, contactPushback: 200, contactPushbackMs: 160,
     preferredMin: 250, preferredMax: 400, eyeColor: 0x76ff03,
     bolt: { windupMs: 520, count: 3, spreadDeg: 15, speed: 270, damage: 11, lifetimeMs: 2600 },
-    summon: { windupMs: 1100, count: 2, maxMinions: 5, cdMs: 9000 },
+    summon: { windupMs: 1100, count: 2, maxMinions: 5, cdMs: 7000 },   // was 9 s
     raise: { windupMs: 700 },
-    recoverMs: 500, attackCooldownMs: 1500
+    recoverMs: 420, attackCooldownMs: 1100   // casts more often (v3.4.2: was 500 / 1500)
   },
   wisp: {
     name: 'Candle Wisp', ai: 'wisp', ghost: true,

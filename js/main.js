@@ -1010,6 +1010,8 @@ class GameScene extends Phaser.Scene {
     const cfg = GAME_CONFIG, lv = cfg.levels;
     let budget = lv.baseBudget + (this.level - 1) * lv.budgetPerLevel;
     let maxCount = lv.maxEnemiesPerRoom;
+    const sdf = this.stage().difficulty;                              // e.g. the Necrotery: +20% enemies
+    if (sdf && sdf.count) { budget *= sdf.count; maxCount = Math.round(maxCount * sdf.count); }
     if (room.type === 'exit') budget *= lv.exitBudgetMul;
     if (this.players.length > 1) { budget *= cfg.coop.budgetMul; maxCount = Math.round(maxCount * cfg.coop.maxEnemiesMul); }
     const wave = this.enemies.buildWave(this.level, budget, maxCount);

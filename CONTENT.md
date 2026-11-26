@@ -20,6 +20,12 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## v3.4.2 – Stage difficulty (the Necrotery felt easy)
+- Stages now have their own difficulty on top of the level scaling (normal enemies only, not bosses):
+  Ink Sewers / Paper Castle (Market Town + Prison): enemy HP ×1.15, damage ×1.1.
+  The Necrotery: enemy HP ×1.4, damage ×1.3, and +20% enemies per room (room budget and max enemies ×1.2).
+- Necromancer casts more: cooldown 1.5 → 1.1 s, recover 0.5 → 0.42 s, summons every 7 s (was 9).
+
 ## v3.4 – Arrow Volley, Brigade Armor, Knight Shield, faster enemies – js/knightgear.js
 - Recurve Bow: Test Dungeon only now (owner: few use cases). Its blueprint is gone.
 - ENEMIES +10% speed (every enemy except bosses and the Gnome). On top of that: Skeleton 120→145, Dark Skeleton
