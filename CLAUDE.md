@@ -57,5 +57,8 @@ own Claude. Several Claudes edit this same repo, so follow these rules exactly.
 - Pull `main` before you start. Don't reformat or reorder code you didn't need to touch (it causes conflicts).
 - Add new content in its own file or at the end of a table instead of rewriting shared files.
 - Describe in the PR what changed for the PLAYER (with numbers) and how you tested it.
+- NEW ITEMS ARE DESIGNED BY THE DEVS, NOT BY CLAUDE (owner's rule): build what they describe, and don't invent
+  new items, effects or numbers they didn't ask for. If a design is missing something (tier, price, a number), ask in
+  the PR instead of making it up.
 - Balance: keep money tight, enemies readable (telegraph attacks), bosses challenging. When unsure about a design
   decision, write it in the PR and ask the owner instead of guessing big.
