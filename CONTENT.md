@@ -20,6 +20,9 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## v3.4.4 – Noble Armor
+- Prince Armor is now NOBLE ARMOR, and its defense matches the Blacksmith Armor: 35% → 28%. Still +50% coins, ★★, 110 coins.
+
 ## v3.4.2 – Stage difficulty (the Necrotery felt easy)
 - Stages now have their own difficulty on top of the level scaling (normal enemies only, not bosses):
   Ink Sewers / Paper Castle (Market Town + Prison): enemy HP ×1.15, damage ×1.1.
