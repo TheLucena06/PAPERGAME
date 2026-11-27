@@ -355,12 +355,15 @@ const RunRoomsMixin = {
     this.arena = null;
     this.endBar();
     this.hud.showBanner('Survived!');
+    this.room.timedOut = true;                      // survival / brawl: only kills paid out, no coin pile at the end
     this.onRoomCleared();
   },
 
-  // Arena reward: coins + a real chest; the hatch appears.
+  // Arena reward: coins (champion arena only) + a real chest; the hatch appears.
   arenaReward(room) {
-    this.coins.drop(this.rooms.W / 2, this.rooms.H / 2 + 40, Math.round((20 + this.level * 4) * this.coinMul()), this.team);
+    // Survival arenas and brawls (they end on a timer) pay only for the enemies you killed: no coin pile.
+    // The champion arena (you have to kill it) still drops its coins.
+    if (!room.timedOut) this.coins.drop(this.rooms.W / 2, this.rooms.H / 2 + 40, Math.round((20 + this.level * 4) * this.coinMul()), this.team);
     room.rewardChest = true; room.mimic = false; room.chestOpened = false;
     this.enterSpecialRoom(room);
     this.prop.setPosition(this.rooms.W / 2, this.rooms.H / 2 - 80);

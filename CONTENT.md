@@ -20,9 +20,12 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
-## v3.4.3 – Mimic hop fix
+## v3.4.3 – Mimic hop fix, arena gold
 - Mimic hops: the time in the air now follows the distance (760 px/s, between 0.2 s and 0.52 s, ×0.7 under half HP).
   It used to take 0.52 s for every hop, so short hops floated in slow motion.
+- Survival arenas and brawls no longer drop a coin pile (20 + 4×level) when the timer ends: the gold you get there
+  is only what the enemies you KILL drop (owner: running around paid as much as fighting). The reward chest and
+  arena shavings stay. The champion arena still drops its coins.
 
 ## v3.4.2 – Stage difficulty (the Necrotery felt easy)
 - Stages now have their own difficulty on top of the level scaling (normal enemies only, not bosses):
