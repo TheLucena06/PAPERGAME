@@ -323,7 +323,7 @@ Knight:
 - Dragonsteel Longsword (post-boss, 90): 46 dmg; every 3rd swing in a row = heavy slash 110, stun 1.5 s.
 - Enchanted Sword (post-boss, 85): 40 dmg, 130°; every 2nd swing fires a spectral sword (30, pierces 3).
 - Blacksmith Armor (post-boss, 85): def 28%, skills -20% cooldown, Sword +20% dmg, Knight weapons +20% attack speed.
-- Prince Armor (post-boss, 110): def 35%, +50% coins.
+- Noble Armor (id princeArmor; post-boss, 110): def 28%, +50% coins. (Was "Prince Armor", def 35%.)
 Monk:
 - 1st Martial Arts Scroll (L1, 30): punches 24, max 2 targets, very close. Double-tap: spin kick 270°, 40, stun 1 s, big knockback, 2 s cd.
 - 2nd Martial Arts Scroll (post-boss, 80): 30 dmg, more reach; same target again = +8%/hit up to +80%. Spin kick 55.

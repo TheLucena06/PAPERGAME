@@ -763,7 +763,7 @@ class GameScene extends Phaser.Scene {
   }
 
   /* ----- Co-op ----- */
-  // Coin multiplier: coin-bonus gear (Prince Armor...) + the co-op bonus.
+  // Coin multiplier: coin-bonus gear (Noble Armor...) + the co-op bonus.
   coinMul() {
     let mul = GAME_CONFIG.coinIncome;     // 0.8: every coin source in a run (enemies, chests, bosses, blocks...)
     for (let i = 0; i < this.players.length; i++) mul += this.players[i].stats.coinMul;

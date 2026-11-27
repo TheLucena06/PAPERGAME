@@ -84,9 +84,9 @@ const ARMOR_TYPES = {
     classMods: [{ type: 'sword', mods: { damageMul: 0.20 } }, { sub: 'Knight', mods: { attackSpeedMul: 0.20 } }]
   },
   princeArmor: {
-    name: 'Prince Armor', short: 'PRNC', class: 'melee', sub: 'Knight', price: 110, postBoss: POST_BOSS_1,
-    desc: 'Very high defense (35%).\n+50% coins from every source.',
-    mods: { defense: 0.35, coinMul: 0.5 }
+    name: 'Noble Armor', short: 'NOBL', class: 'melee', sub: 'Knight', price: 110, postBoss: POST_BOSS_1,   // was "Prince Armor" (id kept for saves)
+    desc: 'Defense 28%.\n+50% coins from every source.',
+    mods: { defense: 0.28, coinMul: 0.5 }
   },
   /* ---- Monk ---- */
   monkVest: {
