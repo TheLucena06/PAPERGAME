@@ -20,6 +20,10 @@
 - Minecart: 30 mana, 9 s cd. Ride 1.4 s, 22 dmg + big knockback, bounces twice, smashes blocks, invulnerable.
   (Nerfed in v2.1: the kit was far too strong, mining gave 6–12 coins per block.)
 
+## v3.4.3 – Mimic hop fix
+- Mimic hops: the time in the air now follows the distance (760 px/s, between 0.2 s and 0.52 s, ×0.7 under half HP).
+  It used to take 0.52 s for every hop, so short hops floated in slow motion.
+
 ## v3.4.2 – Stage difficulty (the Necrotery felt easy)
 - Stages now have their own difficulty on top of the level scaling (normal enemies only, not bosses):
   Ink Sewers / Paper Castle (Market Town + Prison): enemy HP ×1.15, damage ×1.1.

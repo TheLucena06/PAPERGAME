@@ -42,7 +42,7 @@ Object.assign(ENEMY_TYPES, {
     reflectWeak: 3,                                        // its own coins, parried back
     stuckMs: 1000,                                         // after a hop it's stuck in the floor: hit it!
     tongueBite: { stunMs: 2000, hpPct: 0.06 },             // dash-attack (melee) into its tongue
-    hop: { windupMs: 420, airMs: 520, radius: 80, damage: 18 },
+    hop: { windupMs: 420, airMs: 520, minAirMs: 200, speed: 760, radius: 80, damage: 18 },   // air time = distance / 760 px/s, 0.2–0.52 s
     tongue: { windupMs: 480, length: 210, width: 26, damage: 16, activeMs: 180 },
     spit: { count: 5, spreadDeg: 50, speed: 260, damage: 9 },
     recoverMs: 450
@@ -180,7 +180,12 @@ const FOE_AI = {
       return;
     }
     e.setVelocity(0, 0);
-    if (e.state === 'hopWind' && e.stateMs <= 0) { m.setState(e, 'air', d.hop.airMs * fast); e.airTotal = d.hop.airMs * fast; }
+    if (e.state === 'hopWind' && e.stateMs <= 0) {
+      // air time follows the distance (a short hop is quick, a long one takes longer), not one fixed time for every hop
+      const H = d.hop, dist = Math.sqrt((e.hopX1 - e.hopX0) * (e.hopX1 - e.hopX0) + (e.hopY1 - e.hopY0) * (e.hopY1 - e.hopY0));
+      const air = Math.max(H.minAirMs, Math.min(H.airMs, dist / H.speed * 1000)) * fast;
+      m.setState(e, 'air', air); e.airTotal = air;
+    }
     else if (e.state === 'air') {
       const k = 1 - Math.max(0, e.stateMs) / e.airTotal;
       e.body.reset(e.hopX0 + (e.hopX1 - e.hopX0) * k, e.hopY0 + (e.hopY1 - e.hopY0) * k);
